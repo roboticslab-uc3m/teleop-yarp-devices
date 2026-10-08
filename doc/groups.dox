@@ -1,0 +1,48 @@
+/**
+@brief The main, catch-all namespace for Robotics Lab UC3M.
+ */
+namespace roboticslab
+{
+    /**
+     * @brief Contains classes related to unit testing.
+     */
+    namespace test {}
+}
+
+/**
+ * @defgroup teleop_yarp_devices_libraries Libraries
+ * @brief teleop-yarp-devices libraries.
+ */
+
+/**
+ * @ingroup teleop_yarp_devices_libraries
+ * @defgroup YarpPlugins YARP plugins
+ *
+ * @brief Contains libraries that implement YARP device interfaces
+ * and therefore can be invoked as YARP plugins.
+ */
+
+/**
+ * @defgroup teleop_yarp_devices_programs Programs
+ * @brief teleop-yarp-devices programs.
+ */
+
+/**
+ * @defgroup teleop_yarp_devices_tests Tests
+ * @brief teleop-yarp-devices tests.
+ */
+
+/**
+ * @defgroup teleop_yarp_devices_examples Examples
+ * @brief teleop-yarp-devices examples.
+ */
+
+/**
+ * @ingroup teleop_yarp_devices_examples
+ * @defgroup teleop_yarp_devices_examples_cpp C++ examples
+ */
+
+/**
+ * @ingroup teleop_yarp_devices_examples
+ * @defgroup teleop_yarp_devices_examples_py Python examples
+ */

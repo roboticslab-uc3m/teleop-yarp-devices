@@ -1,0 +1,46 @@
+name: Doxygen
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - .github/workflows/doxygen.yml
+    # keep in sync with doxygen_add_docs() at doc/CMakeLists.txt
+    - 'README.md'
+    - 'doc/**'
+    - 'examples/**'
+    - 'firmware/**'
+    - 'libraries/**'
+    - 'programs/**'
+    - 'share/**'
+    - 'tests/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - run: sudo apt-get install -qq --no-install-recommends doxygen
+    - uses: actions/checkout@v7
+    - run: cmake -S doc -B doc/build
+    - run: cmake --build doc/build --target dox
+    - uses: actions/upload-pages-artifact@v5
+      with:
+        path: doc/build/html
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{steps.deployment.outputs.page_url}}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
