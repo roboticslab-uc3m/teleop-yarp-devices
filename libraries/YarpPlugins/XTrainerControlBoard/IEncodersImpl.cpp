@@ -2,13 +2,16 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <yarp/os/LogStream.h>
 #include <yarp/os/SystemClock.h>
+
+#include "LogComponent.hpp"
 
 // ------------------ IEncoders Related -----------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::getAxes(std::size_t & axes)
 {
-    axes = m_axes;
+    axes = motors.size();
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -26,7 +29,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
         ok &= resetEncoder(i);
     }
@@ -48,7 +51,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
         ok &= setEncoder(i, vals[i]);
     }
@@ -61,21 +64,45 @@ yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
 {
     CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+
+    if (auto result = motors[j]->getPresentPosition(); !result.isSuccess())
+    {
+        yCError(XCB) << "Failed to get encoder value:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+    else
+    {
+        *v = result.value();
+    }
+
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 {
-    bool ok = true;
+    auto executor = connector->createGroupExecutor();
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
-        ok &= getEncoder(i, &encs[i]);
+        executor->addCmd(motors[i]->stageGetPresentPosition());
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    if (auto result = executor->executeRead(); !result.isSuccess())
+    {
+        yCError(XCB) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+    else
+    {
+        for (unsigned int i = 0; i < motors.size(); i++)
+        {
+            encs[i] = result.value()[i].value();
+        }
+    }
+
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
@@ -83,21 +110,45 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
 {
     CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+
+    if (auto result = motors[j]->getPresentVelocity(); !result.isSuccess())
+    {
+        yCError(XCB) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+    else
+    {
+        *sp = result.value();
+    }
+
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
 {
-    bool ok = true;
+    auto executor = connector->createGroupExecutor();
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
-        ok &= getEncoderSpeed(i, &spds[i]);
+        executor->addCmd(motors[i]->stageGetPresentVelocity());
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    if (auto result = executor->executeRead(); !result.isSuccess())
+    {
+        yCError(XCB) << "Failed to get encoder speeds:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+    else
+    {
+        for (unsigned int i = 0; i < motors.size(); i++)
+        {
+            spds[i] = result.value()[i].value();
+        }
+    }
+
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
@@ -114,7 +165,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAccelerations(double * ac
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
         ok &= getEncoderAcceleration(i, &accs[i]);
     }
@@ -124,25 +175,25 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAccelerations(double * ac
 
 // ------------------ IEncodersTimed Related -----------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncodersTimed(double * encs, double * time)
-{
-    bool ok = true;
-
-    for (unsigned int i = 0; i < m_axes; i++)
-    {
-        ok &= getEncoderTimed(i, &encs[i], &time[i]);
-    }
-
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
-}
-
-// -----------------------------------------------------------------------------
-
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoderTimed(int j, double * encs, double * time)
 {
     auto ret = getEncoder(j, encs);
     *time = yarp::os::SystemClock::nowSystem();
     return ret;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainerControlBoard::getEncodersTimed(double * encs, double * time)
+{
+    bool ok = true;
+
+    for (unsigned int i = 0; i < motors.size(); i++)
+    {
+        ok &= getEncoderTimed(i, &encs[i], &time[i]);
+    }
+
+    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
 }
 
 // -----------------------------------------------------------------------------

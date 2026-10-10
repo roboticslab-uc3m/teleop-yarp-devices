@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sat Oct 10 16:36:36 2026
+// Generated on: Sat Oct 10 17:26:00 2026
 
 
 #include "XTrainerControlBoard_ParamsParser.h"
@@ -29,6 +29,10 @@ std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() co
 {
     std::vector<std::string> params;
     params.push_back("axes");
+    params.push_back("port");
+    params.push_back("baudrate");
+    params.push_back("ids");
+    params.push_back("extra_id");
     return params;
 }
 
@@ -38,6 +42,33 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
     if (paramName =="axes")
     {
         paramValue = std::to_string(m_axes);
+        return true;
+    }
+    if (paramName =="port")
+    {
+        paramValue = m_port;
+        return true;
+    }
+    if (paramName =="baudrate")
+    {
+        paramValue = std::to_string(m_baudrate);
+        return true;
+    }
+    if (paramName =="ids")
+    {
+        std::ostringstream oss;
+        oss << "( ";
+        for (auto x : m_ids)
+        {
+            oss << x << " ";
+        }
+        oss << " )";
+        paramValue = oss.str();
+        return true;
+    }
+    if (paramName =="extra_id")
+    {
+        paramValue = std::to_string(m_extra_id);
         return true;
     }
 
@@ -77,10 +108,89 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         else
         {
             yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'axes' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Number of axes.";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Number of axes";
             return false;
         }
         prop_check.unput("axes");
+    }
+
+    //Parser of parameter port
+    {
+        if (config.check("port"))
+        {
+            m_port = config.find("port").asString();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'port' using value:" << m_port;
+        }
+        else
+        {
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'port' not found!";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Name of the serial port";
+            return false;
+        }
+        prop_check.unput("port");
+    }
+
+    //Parser of parameter baudrate
+    {
+        if (config.check("baudrate"))
+        {
+            m_baudrate = config.find("baudrate").asInt64();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'baudrate' using value:" << m_baudrate;
+        }
+        else
+        {
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'baudrate' not found!";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Baud rate of the serial port";
+            return false;
+        }
+        prop_check.unput("baudrate");
+    }
+
+    //Parser of parameter ids
+    {
+        if (config.check("ids"))
+        {
+            {
+                m_ids.clear();
+                yarp::os::Bottle* tempBot = config.find("ids").asList();
+                if (tempBot)
+                {
+                    std::string tempBots = tempBot->toString();
+                    for (size_t i=0; i<tempBot->size(); i++)
+                    {
+                        m_ids.push_back(tempBot->get(i).asInt64());
+                    }
+                }
+                else
+                {
+                     yCError(XTrainerControlBoardParamsCOMPONENT) <<"parameter 'ids' is not a properly formatted bottle";
+                }
+            }
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'ids' using value:" << m_ids;
+        }
+        else
+        {
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'ids' not found!";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Motor IDs";
+            return false;
+        }
+        prop_check.unput("ids");
+    }
+
+    //Parser of parameter extra_id
+    {
+        if (config.check("extra_id"))
+        {
+            m_extra_id = config.find("extra_id").asInt64();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extra_id' using value:" << m_extra_id;
+        }
+        else
+        {
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'extra_id' not found!";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Extra motor ID";
+            return false;
+        }
+        prop_check.unput("extra_id");
     }
 
     /*
@@ -119,11 +229,15 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("This is the help for device: XTrainerControlBoard\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("This is the list of the parameters accepted by the device:\n");
-    doc = doc + std::string("'axes': Number of axes.\n");
+    doc = doc + std::string("'axes': Number of axes\n");
+    doc = doc + std::string("'port': Name of the serial port\n");
+    doc = doc + std::string("'baudrate': Baud rate of the serial port\n");
+    doc = doc + std::string("'ids': Motor IDs\n");
+    doc = doc + std::string("'extra_id': Extra motor ID\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --axes <mandatory_value>\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --axes <mandatory_value> --port <mandatory_value> --baudrate <mandatory_value> --ids <mandatory_value> --extra_id <mandatory_value>\n";
     doc = doc + std::string("Using only mandatory params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --axes <mandatory_value>\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --axes <mandatory_value> --port <mandatory_value> --baudrate <mandatory_value> --ids <mandatory_value> --extra_id <mandatory_value>\n";
     doc = doc + std::string("=============================================\n\n");    return doc;
 }

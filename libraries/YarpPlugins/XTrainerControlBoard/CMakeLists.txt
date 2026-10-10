@@ -17,10 +17,13 @@ if(NOT SKIP_XTrainerControlBoard)
 
     target_sources(XTrainerControlBoard PRIVATE XTrainerControlBoard.hpp
                                                 DeviceDriverImpl.cpp
+                                                IAxisInfoImpl.cpp
                                                 IControlLimitsImpl.cpp
                                                 IControlModeImpl.cpp
                                                 IEncodersImpl.cpp
                                                 IPositionDirectImpl.cpp
+                                                IPWMControlImpl.cpp
+                                                IVelocityDirectImpl.cpp
                                                 XTrainerControlBoard_ParamsParser.h
                                                 XTrainerControlBoard_ParamsParser.cpp
                                                 LogComponent.hpp

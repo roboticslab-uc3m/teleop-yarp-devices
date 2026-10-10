@@ -2,12 +2,59 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <yarp/os/LogStream.h>
+
+#include "LogComponent.hpp"
+
+namespace
+{
+    yarp::dev::ControlModeEnum dynamixelToYarpControlMode(dynamixel::OperatingMode mode)
+    {
+        switch (mode)
+        {
+        case dynamixel::OperatingMode::POSITION:
+            return yarp::dev::ControlModeEnum::VOCAB_CM_POSITION;
+        case dynamixel::OperatingMode::VELOCITY:
+            return yarp::dev::ControlModeEnum::VOCAB_CM_VELOCITY;
+        case dynamixel::OperatingMode::PWM:
+            return yarp::dev::ControlModeEnum::VOCAB_CM_PWM;
+        case dynamixel::OperatingMode::CURRENT:
+            return yarp::dev::ControlModeEnum::VOCAB_CM_CURRENT;
+        default:
+            return yarp::dev::ControlModeEnum::VOCAB_CM_UNKNOWN;
+        }
+    }
+
+    dynamixel::OperatingMode yarpToDynamixelControlMode(yarp::dev::SelectableControlModeEnum mode)
+    {
+        switch (mode)
+        {
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_POSITION:
+            return dynamixel::OperatingMode::POSITION;
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_VELOCITY:
+            return dynamixel::OperatingMode::VELOCITY;
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_PWM:
+            return dynamixel::OperatingMode::PWM;
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_CURRENT:
+            return dynamixel::OperatingMode::CURRENT;
+        default:
+            return dynamixel::OperatingMode::POSITION; // default fallback
+        }
+    }
+}
+
 // ------------------- IControlMode Related ------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::getAvailableControlModes(int j, std::vector<yarp::dev::SelectableControlModeEnum> & avail)
 {
     CHECK_JOINT(j);
-    avail = {};
+
+    avail = {
+        yarp::dev::SelectableControlModeEnum::VOCAB_CM_POSITION_DIRECT,
+        yarp::dev::SelectableControlModeEnum::VOCAB_CM_VELOCITY_DIRECT,
+        yarp::dev::SelectableControlModeEnum::VOCAB_CM_PWM,
+    };
+
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -16,7 +63,17 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAvailableControlModes(int j, std
 yarp::dev::ReturnValue XTrainerControlBoard::getControlMode(int j, yarp::dev::ControlModeEnum & mode)
 {
     CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+
+    auto result = motors[j]->getOperatingMode();
+
+    if (!result.isSuccess())
+    {
+        yCError(XCB) << "Failed to get control mode:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+
+    mode = dynamixelToYarpControlMode(result.value());
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,7 +113,17 @@ yarp::dev::ReturnValue XTrainerControlBoard::getControlModes(const std::vector<i
 yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::SelectableControlModeEnum mode)
 {
     CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+
+    auto dMode = yarpToDynamixelControlMode(mode);
+    auto result = motors[j]->setOperatingMode(dMode);
+
+    if (!result.isSuccess())
+    {
+        yCError(XCB) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
+        return yarp::dev::ReturnValue_error_method_failed;
+    }
+
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
