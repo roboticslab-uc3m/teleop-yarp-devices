@@ -2,6 +2,8 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <cmath>
+
 #include <yarp/os/LogStream.h>
 #include <yarp/os/SystemClock.h>
 
@@ -72,7 +74,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
     }
     else
     {
-        *v = result.value();
+        *v = result.value() * 360.0 / m_encoderPulses;
     }
 
     return yarp::dev::ReturnValue_ok;
@@ -98,7 +100,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
     {
         for (unsigned int i = 0; i < motors.size(); i++)
         {
-            encs[i] = result.value()[i].value();
+            encs[i] = result.value()[i].value() * 360.0 / m_encoderPulses;
         }
     }
 
@@ -118,7 +120,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
     }
     else
     {
-        *sp = result.value();
+        *sp = result.value() * 360.0 / m_encoderPulses;
     }
 
     return yarp::dev::ReturnValue_ok;
@@ -144,7 +146,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
     {
         for (unsigned int i = 0; i < motors.size(); i++)
         {
-            spds[i] = result.value()[i].value();
+            spds[i] = result.value()[i].value() * 360.0 / m_encoderPulses;
         }
     }
 
@@ -186,14 +188,15 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderTimed(int j, double * enc
 
 yarp::dev::ReturnValue XTrainerControlBoard::getEncodersTimed(double * encs, double * time)
 {
-    bool ok = true;
+    auto ret = getEncoders(encs);
+    auto now = yarp::os::SystemClock::nowSystem();
 
     for (unsigned int i = 0; i < motors.size(); i++)
     {
-        ok &= getEncoderTimed(i, &encs[i], &time[i]);
+        time[i] = now;
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    return ret;
 }
 
 // -----------------------------------------------------------------------------

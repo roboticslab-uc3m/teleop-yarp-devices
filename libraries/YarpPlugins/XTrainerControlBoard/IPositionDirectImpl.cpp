@@ -12,7 +12,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (auto result = motors[j]->setGoalPosition(ref); !result.isSuccess())
+    if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
@@ -29,7 +29,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(const double * refs)
 
     for (auto i = 0; i < motors.size(); i++)
     {
-        executor->addCmd(motors[i]->stageSetGoalPosition(refs[i]));
+        executor->addCmd(motors[i]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0));
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
@@ -49,7 +49,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int
 
     for (int i = 0; i < n_joint; i++)
     {
-        executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i]));
+        executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0));
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())

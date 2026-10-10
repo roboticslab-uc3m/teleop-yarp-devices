@@ -16,12 +16,6 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_axes <= 0)
-    {
-        yCError(XCB) << "Invalid number of axes:" << m_axes;
-        return false;
-    }
-
     if (m_port.empty())
     {
         yCError(XCB) << "Invalid empty serial port";
@@ -34,13 +28,13 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_ids.empty())
+    if (m_motorIds.empty())
     {
         yCError(XCB) << "Invalid empty motor IDs list";
         return false;
     }
 
-    for (const auto & id : m_ids)
+    for (const auto & id : m_motorIds)
     {
         if (id <= 0)
         {
@@ -49,9 +43,15 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         }
     }
 
-    if (m_extra_id <= 0)
+    if (m_extraId <= 0)
     {
-        yCError(XCB) << "Invalid extra motor ID:" << m_extra_id;
+        yCError(XCB) << "Invalid extra motor ID:" << m_extraId;
+        return false;
+    }
+
+    if (m_encoderPulses <= 0)
+    {
+        yCError(XCB) << "Invalid number of encoder pulses:" << m_encoderPulses;
         return false;
     }
 
@@ -69,12 +69,12 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
-    for (const auto & id : m_ids)
+    for (const auto & id : m_motorIds)
     {
         motors.push_back(connector->createMotor(id));
     }
 
-    motors.push_back(connector->createMotor(m_extra_id));
+    motors.push_back(connector->createMotor(m_extraId));
 
     for (const auto & motor : motors)
     {

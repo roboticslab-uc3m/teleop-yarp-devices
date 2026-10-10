@@ -88,9 +88,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::getControlModes(std::vector<yarp::d
 {
     bool ok = true;
 
-    modes.resize(m_axes);
+    modes.resize(motors.size());
 
-    for (unsigned int i = 0; i < m_axes; i++)
+    for (unsigned int i = 0; i < motors.size(); i++)
     {
         ok &= getControlMode(i, modes[i]);
     }

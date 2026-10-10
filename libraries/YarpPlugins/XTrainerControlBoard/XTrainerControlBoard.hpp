@@ -20,7 +20,7 @@
 
 #include "XTrainerControlBoard_ParamsParser.h"
 
-#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= m_axes) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
+#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= motors.size()) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
 
 /**
  * @ingroup YarpPlugins
