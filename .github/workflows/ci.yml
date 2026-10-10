@@ -67,6 +67,13 @@ jobs:
         ref: ${{matrix.robotology.yarp}}
         path: .deps/yarp
 
+    - name: Check out DynamixelSDK
+      if: ${{matrix.robotology.yarp != 'yarp-3.12'}}
+      uses: actions/checkout@v7
+      with:
+        repository: ROBOTIS-GIT/DynamixelSDK
+        path: .deps/DynamixelSDK
+
     - name: Install dependencies via apt
       run: sudo apt-get update && sudo apt-get install -qq ccache libspnav-dev libxwiimote-dev
 
@@ -101,6 +108,13 @@ jobs:
         cmake -S .deps/yarp -B .deps/yarp/build -DSKIP_ACE=ON -DYARP_DISABLE_VERSION_SOURCE=ON
         cmake --build .deps/yarp/build
         sudo cmake --install .deps/yarp/build
+
+    - name: Build DynamixelSDK
+      if: ${{matrix.robotology.yarp != 'yarp-3.12'}}
+      run: |
+        cmake -S .deps/DynamixelSDK/c++ -B .deps/DynamixelSDK/c++/build
+        cmake --build .deps/DynamixelSDK/c++/build
+        sudo cmake --install .deps/DynamixelSDK/c++/build
 
     - name: Configure main project
       run: cmake -S . -B build -DALLOW_DEVICE_PARAM_PARSER_GENERATION=ON
