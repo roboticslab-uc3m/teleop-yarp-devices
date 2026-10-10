@@ -36,7 +36,7 @@ endif()
 
 # Soft dependencies.
 find_package(Doxygen QUIET)
-find_package(GTestSources 1.8 QUIET)
+find_package(dynamixel_sdk 4.1 QUIET)
 find_package(Leap 2.3 EXACT QUIET)
 find_package(Spnav QUIET)
 find_package(XWiimote 0.3 QUIET)

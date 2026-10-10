@@ -6,3 +6,4 @@ option(ALLOW_DEVICE_PARAM_PARSER_GENERATION "Allow YARP to (re)build device para
 # add_subdirectory(LeapMotionSensor)
 add_subdirectory(SpaceNavigator)
 add_subdirectory(Wiimote)
+add_subdirectory(XTrainerControlBoard)
