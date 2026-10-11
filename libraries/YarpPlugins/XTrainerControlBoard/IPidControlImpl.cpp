@@ -17,7 +17,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAvailablePids(int j, std::vector
         yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY
     };
 
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------

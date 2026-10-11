@@ -22,6 +22,7 @@ if(NOT SKIP_XTrainerControlBoard)
                                                 IControlModeImpl.cpp
                                                 IEncodersImpl.cpp
                                                 IPositionDirectImpl.cpp
+                                                IPidControlImpl.cpp
                                                 IPWMControlImpl.cpp
                                                 IVelocityDirectImpl.cpp
                                                 XTrainerControlBoard_ParamsParser.h
