@@ -12,6 +12,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
@@ -25,6 +27,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setPositions(const double * refs)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (auto i = 0; i < motors.size(); i++)
@@ -45,6 +49,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(const double * refs)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int * joints, const double * refs)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (int i = 0; i < n_joint; i++)

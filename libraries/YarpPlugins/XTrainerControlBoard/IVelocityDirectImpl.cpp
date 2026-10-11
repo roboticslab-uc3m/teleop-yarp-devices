@@ -12,6 +12,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(int j, double ref)
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[j]->setGoalVelocity(ref * m_encoderPulses / 360.0); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set velocity:" << dynamixel::getErrorMessage(result.error());
@@ -25,6 +27,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(int j, double ref)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(const std::vector<double> & vels)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (int j = 0; j < motors.size(); j++)
@@ -45,6 +49,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(const std::vector<do
 
 yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(const std::vector<int> & jnts, const std::vector<double> & vels)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (size_t i = 0; i < jnts.size(); i++)

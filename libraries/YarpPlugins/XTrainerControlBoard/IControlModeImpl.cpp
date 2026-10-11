@@ -126,6 +126,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::Se
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
+    std::lock_guard lock(mtx);
+
     const auto dxlMode = yarpToDynamixelControlMode(mode);
     const bool dxlModeAlreadySet = dxlMode == motors[j]->getOperatingModeStatus();
 
@@ -190,6 +192,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
     {
         dxlModes.push_back(yarpToDynamixelControlMode(mode));
     }
+
+    std::lock_guard lock(mtx);
 
     auto executorOff = connector->createGroupExecutor();
 

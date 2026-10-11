@@ -26,6 +26,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPid(const yarp::dev::PidControlT
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(mtx);
+
     switch (pidtype)
     {
     case yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_POSITION:

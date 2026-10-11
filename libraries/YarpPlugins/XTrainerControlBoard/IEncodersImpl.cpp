@@ -67,6 +67,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[j]->getPresentPosition(); !result.isSuccess())
     {
         yCError(XCB) << "Failed to get encoder value:" << dynamixel::getErrorMessage(result.error());
@@ -84,6 +86,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
 
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (unsigned int i = 0; i < motors.size(); i++)
@@ -113,6 +117,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[j]->getPresentVelocity(); !result.isSuccess())
     {
         yCError(XCB) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
@@ -130,6 +136,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
 
 yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (unsigned int i = 0; i < motors.size(); i++)

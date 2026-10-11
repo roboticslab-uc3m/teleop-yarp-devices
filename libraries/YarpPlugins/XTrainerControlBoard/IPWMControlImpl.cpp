@@ -21,6 +21,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefDutyCycle(int m, double ref)
 {
     CHECK_JOINT(m);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[m]->setGoalPWM(ref); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
@@ -34,6 +36,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefDutyCycle(int m, double ref)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setRefDutyCycles(const double * refs)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (int j = 0; j < motors.size(); j++)
@@ -78,6 +82,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getDutyCycle(int m, double * val)
 {
     CHECK_JOINT(m);
 
+    std::lock_guard lock(mtx);
+
     if (auto result = motors[m]->getPresentPWM(); !result.isSuccess())
     {
         yCError(XCB) << "Failed to get PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
@@ -95,6 +101,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getDutyCycle(int m, double * val)
 
 yarp::dev::ReturnValue XTrainerControlBoard::getDutyCycles(double * vals)
 {
+    std::lock_guard lock(mtx);
+
     auto executor = connector->createGroupExecutor();
 
     for (int j = 0; j < motors.size(); j++)

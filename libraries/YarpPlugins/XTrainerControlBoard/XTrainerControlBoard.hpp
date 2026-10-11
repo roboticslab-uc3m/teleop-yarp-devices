@@ -4,6 +4,7 @@
 #define __XTRAINER_CONTROL_BOARD_HPP__
 
 #include <memory>
+#include <mutex>
 
 #include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/IAxisInfo.h>
@@ -139,6 +140,7 @@ public:
 private:
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
+    std::mutex mtx;
 };
 
 #endif // __XTRAINER_CONTROL_BOARD_HPP__
