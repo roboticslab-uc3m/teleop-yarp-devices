@@ -21,7 +21,10 @@
 
 #include "XTrainerControlBoard_ParamsParser.h"
 
-#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= motors.size()) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
+constexpr auto NUM_AXES = 6; // controlled axes
+constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
+
+#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= NUM_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
 
 /**
  * @ingroup YarpPlugins
@@ -138,6 +141,8 @@ public:
     bool close() override;
 
 private:
+    bool setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid);
+
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
     std::mutex mtx;

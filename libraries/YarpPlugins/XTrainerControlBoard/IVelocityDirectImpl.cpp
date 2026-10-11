@@ -2,6 +2,8 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <numeric> // std::iota
+
 #include <yarp/os/LogStream.h>
 
 #include "LogComponent.hpp"
@@ -11,6 +13,13 @@
 yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(int j, double ref)
 {
     CHECK_JOINT(j);
+
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    {
+        std::vector indices = {j};
+        std::vector values = {ref};
+        return setRefVelocity(indices, values);
+    }
 
     std::lock_guard lock(mtx);
 
@@ -27,22 +36,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(int j, double ref)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(const std::vector<double> & vels)
 {
-    std::lock_guard lock(mtx);
-
-    auto executor = connector->createGroupExecutor();
-
-    for (int j = 0; j < motors.size(); j++)
-    {
-        executor->addCmd(motors[j]->stageSetGoalVelocity(vels[j] / m_velocityRatio));
-    }
-
-    if (auto result = executor->executeWrite(); !result.isSuccess())
-    {
-        yCError(XCB) << "Failed to set velocities:" << dynamixel::getErrorMessage(result.error());
-        return yarp::dev::ReturnValue_error_method_failed;
-    }
-
-    return yarp::dev::ReturnValue_ok;
+    std::vector<int> indices(NUM_AXES);
+    std::iota(indices.begin(), indices.end(), 0);
+    return setRefVelocity(indices, vels);
 }
 
 // -----------------------------------------------------------------------------
@@ -53,9 +49,14 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefVelocity(const std::vector<in
 
     auto executor = connector->createGroupExecutor();
 
-    for (size_t i = 0; i < jnts.size(); i++)
+    for (auto i = 0; i < jnts.size(); i++)
     {
         executor->addCmd(motors[jnts[i]]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
+
+        if (jnts[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        {
+            executor->addCmd(motors[NUM_AXES]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
+        }
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
@@ -81,7 +82,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefVelocity(std::vector<double> 
 {
     bool ok = true;
 
-    for (int j = 0; j < motors.size(); j++)
+    vels.resize(NUM_AXES);
+
+    for (auto j = 0; j < NUM_AXES; j++)
     {
         ok &= getRefVelocity(j, vels[j]);
     }
@@ -95,7 +98,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefVelocity(const std::vector<in
 {
     bool ok = true;
 
-    for (size_t i = 0; i < jnts.size(); i++)
+    vels.resize(jnts.size());
+
+    for (auto i = 0; i < jnts.size(); i++)
     {
         ok &= getRefVelocity(jnts[i], vels[i]);
     }

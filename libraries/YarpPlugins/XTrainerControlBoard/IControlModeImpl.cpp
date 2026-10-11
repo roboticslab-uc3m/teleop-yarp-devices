@@ -89,9 +89,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::getControlModes(std::vector<yarp::d
 {
     bool ok = true;
 
-    modes.resize(motors.size());
+    modes.resize(NUM_AXES);
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         ok &= getControlMode(i, modes[i]);
     }
@@ -107,7 +107,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getControlModes(const std::vector<i
 
     modes.resize(joints.size());
 
-    for (size_t i = 0; i < joints.size(); i++)
+    for (auto i = 0; i < joints.size(); i++)
     {
         ok &= getControlMode(joints[i], modes[i]);
     }
@@ -120,6 +120,13 @@ yarp::dev::ReturnValue XTrainerControlBoard::getControlModes(const std::vector<i
 yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::SelectableControlModeEnum mode)
 {
     CHECK_JOINT(j);
+
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    {
+        std::vector indices = {j};
+        std::vector modes = {mode};
+        return setControlModes(indices, modes);
+    }
 
     if (std::find(availableControlModes.begin(), availableControlModes.end(), mode) == availableControlModes.end())
     {
@@ -176,7 +183,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::Se
 
 yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<yarp::dev::SelectableControlModeEnum> & modes)
 {
-    std::vector<int> joints(motors.size());
+    std::vector<int> joints(NUM_AXES);
     std::iota(joints.begin(), joints.end(), 0);
     return setControlModes(joints, modes);
 }
@@ -213,6 +220,11 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
         if (motors[joints[j]]->getTorqueStatus() == 1 && (idleModeRequested || !dxlModeAlreadySet))
         {
             executorOff->addCmd(motors[joints[j]]->stageDisableTorque());
+
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            {
+                executorOff->addCmd(motors[NUM_AXES]->stageDisableTorque());
+            }
         }
     }
 
@@ -228,7 +240,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
     if (std::all_of(modes.begin(), modes.end(), [](auto mode) { return mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE; }))
     {
         auto decoded = static_cast<yarp::conf::vocab32_t>(yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE);
-        yCInfo(XCB) << "Control mode of all joints set to" << yarp::os::Vocab32::decode(decoded);
+        yCInfo(XCB) << "Control mode of all selected joints set to" << yarp::os::Vocab32::decode(decoded);
         return yarp::dev::ReturnValue_ok;
     }
 
@@ -244,6 +256,15 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
                 yCError(XCB) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
                 return yarp::dev::ReturnValue_error_method_failed;
             }
+
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            {
+                if (auto result = motors[NUM_AXES]->setOperatingMode(dxlModes[j]); !result.isSuccess())
+                {
+                    yCError(XCB) << "Failed to set control mode for extra motor:" << dynamixel::getErrorMessage(result.error());
+                    return yarp::dev::ReturnValue_error_method_failed;
+                }
+            }
         }
     }
 
@@ -256,6 +277,11 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
         if (motors[joints[j]]->getTorqueStatus() == 0 && !idleModeRequested)
         {
             executorOn->addCmd(motors[joints[j]]->stageEnableTorque());
+
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            {
+                executorOn->addCmd(motors[NUM_AXES]->stageEnableTorque());
+            }
         }
     }
 

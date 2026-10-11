@@ -2,6 +2,9 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <algorithm> // std::find
+#include <unordered_set>
+
 #include <yarp/os/LogStream.h>
 
 #include "LogComponent.hpp"
@@ -28,9 +31,15 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_motorIds.empty())
+    if (m_motorIds.size() != NUM_AXES)
     {
-        yCError(XCB) << "Invalid empty motor IDs list";
+        yCError(XCB) << "Invalid number of motor IDs, expected" << NUM_AXES << "but got" << m_motorIds.size();
+        return false;
+    }
+
+    if (std::unordered_set(m_motorIds.begin(), m_motorIds.end()).size() != m_motorIds.size())
+    {
+        yCError(XCB) << "Duplicate motor IDs found in the list";
         return false;
     }
 
@@ -43,9 +52,14 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         }
     }
 
-    if (m_extraId <= 0)
+    if (m_extraId < 0)
     {
         yCError(XCB) << "Invalid extra motor ID:" << m_extraId;
+        return false;
+    }
+    else if (m_extraId != 0 && std::find(m_motorIds.begin(), m_motorIds.end(), m_extraId) != m_motorIds.end())
+    {
+        yCError(XCB) << "Extra motor ID" << m_extraId << "is already in the list of motor IDs";
         return false;
     }
 
@@ -80,7 +94,12 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         motors.push_back(connector->createMotor(id));
     }
 
-    // motors.push_back(connector->createMotor(m_extraId));
+    if (m_extraId != 0)
+    {
+        yCInfo(XCB) << "Using extra motor with ID" << m_extraId;
+        motors.push_back(connector->createMotor(m_extraId)); // size: NUM_AXES + 1
+        motors.back()->setDirection(dynamixel::Direction::REVERSE);
+    }
 
     for (const auto & motor : motors)
     {

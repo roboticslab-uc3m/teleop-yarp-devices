@@ -13,7 +13,7 @@
 
 yarp::dev::ReturnValue XTrainerControlBoard::getAxes(std::size_t & axes)
 {
-    axes = motors.size();
+    axes = NUM_AXES;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -31,7 +31,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         ok &= resetEncoder(i);
     }
@@ -53,7 +53,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         ok &= setEncoder(i, vals[i]);
     }
@@ -90,7 +90,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 
     auto executor = connector->createGroupExecutor();
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         executor->addCmd(motors[i]->stageGetPresentPosition());
     }
@@ -102,7 +102,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
     }
     else
     {
-        for (unsigned int i = 0; i < motors.size(); i++)
+        for (auto i = 0; i < NUM_AXES; i++)
         {
             encs[i] = result.value()[i].value() * 360.0 / m_encoderPulses;
         }
@@ -140,7 +140,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
 
     auto executor = connector->createGroupExecutor();
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         executor->addCmd(motors[i]->stageGetPresentVelocity());
     }
@@ -152,7 +152,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
     }
     else
     {
-        for (unsigned int i = 0; i < motors.size(); i++)
+        for (auto i = 0; i < NUM_AXES; i++)
         {
             spds[i] = result.value()[i].value() * m_velocityRatio;
         }
@@ -175,7 +175,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAccelerations(double * ac
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         ok &= getEncoderAcceleration(i, &accs[i]);
     }
@@ -199,7 +199,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncodersTimed(double * encs, dou
     auto ret = getEncoders(encs);
     auto now = yarp::os::SystemClock::nowSystem();
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         time[i] = now;
     }

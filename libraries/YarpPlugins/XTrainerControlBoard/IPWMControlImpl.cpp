@@ -9,9 +9,7 @@
 // ------------------- IVelocityDirect Related --------------------------------
 yarp::dev::ReturnValue XTrainerControlBoard::getNumberOfMotors(int * number)
 {
-    std::size_t axes;
-    getAxes(axes);
-    *number = static_cast<int>(axes);
+    *number = NUM_AXES;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -23,10 +21,25 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefDutyCycle(int m, double ref)
 
     std::lock_guard lock(mtx);
 
-    if (auto result = motors[m]->setGoalPWM(ref); !result.isSuccess())
+    if (m == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
     {
-        yCError(XCB) << "Failed to set PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
-        return yarp::dev::ReturnValue_error_method_failed;
+        auto executor = connector->createGroupExecutor();
+        executor->addCmd(motors[m]->stageSetGoalPWM(ref));
+        executor->addCmd(motors[NUM_AXES]->stageSetGoalPWM(ref));
+
+        if (auto result = executor->executeWrite(); !result.isSuccess())
+        {
+            yCError(XCB) << "Failed to set PWM duty cycle for dual-motor axis:" << dynamixel::getErrorMessage(result.error());
+            return yarp::dev::ReturnValue_error_method_failed;
+        }
+    }
+    else
+    {
+        if (auto result = motors[m]->setGoalPWM(ref); !result.isSuccess())
+        {
+            yCError(XCB) << "Failed to set PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
+            return yarp::dev::ReturnValue_error_method_failed;
+        }
     }
 
     return yarp::dev::ReturnValue_ok;
@@ -40,9 +53,14 @@ yarp::dev::ReturnValue XTrainerControlBoard::setRefDutyCycles(const double * ref
 
     auto executor = connector->createGroupExecutor();
 
-    for (int j = 0; j < motors.size(); j++)
+    for (auto j = 0; j < NUM_AXES; j++)
     {
         executor->addCmd(motors[j]->stageSetGoalPWM(refs[j]));
+
+        if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        {
+            executor->addCmd(motors[NUM_AXES]->stageSetGoalPWM(refs[j]));
+        }
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
@@ -68,7 +86,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefDutyCycles(double * refs)
 {
     bool ok = true;
 
-    for (int j = 0; j < motors.size(); j++)
+    for (auto j = 0; j < NUM_AXES; j++)
     {
         ok &= getRefDutyCycle(j, &refs[j]);
     }
@@ -105,7 +123,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getDutyCycles(double * vals)
 
     auto executor = connector->createGroupExecutor();
 
-    for (int j = 0; j < motors.size(); j++)
+    for (auto j = 0; j < NUM_AXES; j++)
     {
         executor->addCmd(motors[j]->stageGetPresentPWM());
     }
@@ -117,7 +135,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getDutyCycles(double * vals)
     }
     else
     {
-        for (int j = 0; j < motors.size(); j++)
+        for (auto j = 0; j < NUM_AXES; j++)
         {
             vals[j] = result.value()[j].value();
         }

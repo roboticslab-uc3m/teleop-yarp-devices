@@ -2,15 +2,26 @@
 
 #include "XTrainerControlBoard.hpp"
 
+#include <numeric> // std::iota
+
 #include <yarp/os/LogStream.h>
 
 #include "LogComponent.hpp"
+
+constexpr auto EXTRA_MOTOR_OFFSET = 90.0;
 
 // ------------------- IPositionDirect Related --------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 {
     CHECK_JOINT(j);
+
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    {
+        std::vector indices = {j};
+        std::vector values = {ref};
+        return setPositions(indices.size(), indices.data(), values.data());
+    }
 
     std::lock_guard lock(mtx);
 
@@ -27,22 +38,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 
 yarp::dev::ReturnValue XTrainerControlBoard::setPositions(const double * refs)
 {
-    std::lock_guard lock(mtx);
-
-    auto executor = connector->createGroupExecutor();
-
-    for (auto i = 0; i < motors.size(); i++)
-    {
-        executor->addCmd(motors[i]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0));
-    }
-
-    if (auto result = executor->executeWrite(); !result.isSuccess())
-    {
-        yCError(XCB) << "Failed to set positions:" << dynamixel::getErrorMessage(result.error());
-        return yarp::dev::ReturnValue_error_method_failed;
-    }
-
-    return yarp::dev::ReturnValue_ok;
+    std::vector<int> indices(NUM_AXES);
+    std::iota(indices.begin(), indices.end(), 0);
+    return setPositions(NUM_AXES, indices.data(), refs);
 }
 
 // -----------------------------------------------------------------------------
@@ -53,9 +51,14 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int
 
     auto executor = connector->createGroupExecutor();
 
-    for (int i = 0; i < n_joint; i++)
+    for (auto i = 0; i < n_joint; i++)
     {
         executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0));
+
+        if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        {
+            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + EXTRA_MOTOR_OFFSET) * m_encoderPulses / 360.0));
+        }
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
@@ -81,7 +84,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefPositions(double * refs)
 {
     bool ok = true;
 
-    for (int j = 0; j < motors.size(); j++)
+    for (auto j = 0; j < NUM_AXES; j++)
     {
         ok &= getRefPosition(j, &refs[j]);
     }
@@ -95,7 +98,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefPositions(int n_joint, const 
 {
     bool ok = true;
 
-    for (int i = 0; i < n_joint; i++)
+    for (auto i = 0; i < n_joint; i++)
     {
         ok &= getRefPosition(joints[i], &refs[i]);
     }

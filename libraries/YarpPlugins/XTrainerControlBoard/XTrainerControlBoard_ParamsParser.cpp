@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sun Oct 11 17:54:27 2026
+// Generated on: Sun Oct 11 20:04:04 2026
 
 
 #include "XTrainerControlBoard_ParamsParser.h"
@@ -195,9 +195,7 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'extraId' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Extra motor ID";
-            return false;
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraId' using DEFAULT value:" << m_extraId;
         }
         prop_check.unput("extraId");
     }
@@ -279,8 +277,8 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096 --velocityRatio 1.373329569\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("Using only mandatory params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096 --velocityRatio 1.373329569\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;
 }

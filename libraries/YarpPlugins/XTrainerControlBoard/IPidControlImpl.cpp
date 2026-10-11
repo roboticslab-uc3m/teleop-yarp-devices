@@ -22,12 +22,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAvailablePids(int j, std::vector
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setPid(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid)
+bool XTrainerControlBoard::setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid)
 {
-    CHECK_JOINT(j);
-
-    std::lock_guard lock(mtx);
-
     switch (pidtype)
     {
     case yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_POSITION:
@@ -73,7 +69,25 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPid(const yarp::dev::PidControlT
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
-    return yarp::dev::ReturnValue_ok;
+    return true;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainerControlBoard::setPid(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid)
+{
+    CHECK_JOINT(j);
+
+    std::lock_guard lock(mtx);
+
+    bool ok = setPidInternal(pidtype, j, pid);
+
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    {
+        ok &= setPidInternal(pidtype, NUM_AXES, pid);
+    }
+
+    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
 }
 
 // -----------------------------------------------------------------------------
@@ -82,7 +96,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPids(const yarp::dev::PidControl
 {
     bool ok = true;
 
-    for (unsigned int i = 0; i < motors.size(); i++)
+    for (auto i = 0; i < NUM_AXES; i++)
     {
         ok &= setPid(pidtype, i, pids[i]);
     }
