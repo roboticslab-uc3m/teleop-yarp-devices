@@ -8,8 +8,6 @@
 
 #include "LogComponent.hpp"
 
-constexpr auto EXTRA_MOTOR_OFFSET = 90.0;
-
 // ------------------- IPositionDirect Related --------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
@@ -57,7 +55,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int
 
         if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + EXTRA_MOTOR_OFFSET) * m_encoderPulses / 360.0));
+            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0));
         }
     }
 

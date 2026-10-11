@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sun Oct 11 20:04:04 2026
+// Generated on: Sun Oct 11 21:41:39 2026
 
 
 #include "XTrainerControlBoard_ParamsParser.h"
@@ -51,6 +51,8 @@ std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() co
     params.push_back("baudrate");
     params.push_back("motorIds");
     params.push_back("extraId");
+    params.push_back("extraReverse");
+    params.push_back("extraOffset");
     params.push_back("encoderPulses");
     params.push_back("velocityRatio");
     return params;
@@ -84,6 +86,17 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
     if (paramName =="extraId")
     {
         paramValue = std::to_string(m_extraId);
+        return true;
+    }
+    if (paramName =="extraReverse")
+    {
+        if (m_extraReverse==true) paramValue = "true";
+        else paramValue = "false";
+        return true;
+    }
+    if (paramName =="extraOffset")
+    {
+        paramValue = std::to_string(m_extraOffset);
         return true;
     }
     if (paramName =="encoderPulses")
@@ -200,6 +213,34 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         prop_check.unput("extraId");
     }
 
+    //Parser of parameter extraReverse
+    {
+        if (config.check("extraReverse"))
+        {
+            m_extraReverse = config.find("extraReverse").asBool();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraReverse' using value:" << m_extraReverse;
+        }
+        else
+        {
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraReverse' using DEFAULT value:" << m_extraReverse;
+        }
+        prop_check.unput("extraReverse");
+    }
+
+    //Parser of parameter extraOffset
+    {
+        if (config.check("extraOffset"))
+        {
+            m_extraOffset = config.find("extraOffset").asFloat64();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraOffset' using value:" << m_extraOffset;
+        }
+        else
+        {
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraOffset' using DEFAULT value:" << m_extraOffset;
+        }
+        prop_check.unput("extraOffset");
+    }
+
     //Parser of parameter encoderPulses
     {
         if (config.check("encoderPulses"))
@@ -273,11 +314,13 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("'baudrate': Baud rate of the serial port\n");
     doc = doc + std::string("'motorIds': Motor IDs\n");
     doc = doc + std::string("'extraId': Extra motor ID\n");
+    doc = doc + std::string("'extraReverse': Whether to reverse the extra motor\n");
+    doc = doc + std::string("'extraOffset': Offset to apply to the extra motor\n");
     doc = doc + std::string("'encoderPulses': Number of encoder pulses per revolution\n");
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --encoderPulses 4096 --velocityRatio 1.373329569\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("Using only mandatory params:\n");
     doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;

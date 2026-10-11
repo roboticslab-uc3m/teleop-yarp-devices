@@ -77,9 +77,7 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
 
     connector = std::make_unique<dynamixel::Connector>(m_port, m_baudrate);
 
-    const auto result = connector->broadcastPing();
-
-    if (result.isSuccess())
+    if (auto result = connector->broadcastPing(); result.isSuccess())
     {
         yCInfo(XCB) << "Broadcast ping successful, got IDs:" << result.value();
     }
@@ -98,7 +96,11 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
     {
         yCInfo(XCB) << "Using extra motor with ID" << m_extraId;
         motors.push_back(connector->createMotor(m_extraId)); // size: NUM_AXES + 1
-        motors.back()->setDirection(dynamixel::Direction::REVERSE);
+
+        if (m_extraReverse)
+        {
+            motors.back()->setDirection(dynamixel::Direction::REVERSE);
+        }
     }
 
     for (const auto & motor : motors)
@@ -120,6 +122,7 @@ bool XTrainerControlBoard::close()
     if (connector)
     {
         connector->closePort();
+        connector.reset();
     }
 
     return true;
