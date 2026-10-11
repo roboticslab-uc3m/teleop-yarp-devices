@@ -24,9 +24,9 @@ namespace
         switch (mode)
         {
         case dynamixel::OperatingMode::POSITION:
-            return yarp::dev::ControlModeEnum::VOCAB_CM_POSITION;
+            return yarp::dev::ControlModeEnum::VOCAB_CM_POSITION_DIRECT;
         case dynamixel::OperatingMode::VELOCITY:
-            return yarp::dev::ControlModeEnum::VOCAB_CM_VELOCITY;
+            return yarp::dev::ControlModeEnum::VOCAB_CM_VELOCITY_DIRECT;
         case dynamixel::OperatingMode::PWM:
             return yarp::dev::ControlModeEnum::VOCAB_CM_PWM;
         case dynamixel::OperatingMode::CURRENT:
@@ -40,16 +40,17 @@ namespace
     {
         switch (mode)
         {
-        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_POSITION:
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_POSITION_DIRECT:
             return dynamixel::OperatingMode::POSITION;
-        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_VELOCITY:
+        case yarp::dev::SelectableControlModeEnum::VOCAB_CM_VELOCITY_DIRECT:
             return dynamixel::OperatingMode::VELOCITY;
         case yarp::dev::SelectableControlModeEnum::VOCAB_CM_PWM:
             return dynamixel::OperatingMode::PWM;
         case yarp::dev::SelectableControlModeEnum::VOCAB_CM_CURRENT:
             return dynamixel::OperatingMode::CURRENT;
         default:
-            return dynamixel::OperatingMode::EXTENDED_POSITION; // tricky, but eases if-branching in setControlMode()
+            // there is no UNKNOWN mode on the dxl side
+            return dynamixel::OperatingMode::CURRENT_BASED_POSITION;
         }
     }
 }
@@ -126,18 +127,20 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::Se
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
+    yCDebug(XCB) << "Setting control mode of joint" << j << "to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+
     std::lock_guard lock(mtx);
 
     const auto dxlMode = yarpToDynamixelControlMode(mode);
+    const bool idleModeRequested = mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE;
     const bool dxlModeAlreadySet = dxlMode == motors[j]->getOperatingModeStatus();
 
-    if (mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE && motors[j]->getTorqueStatus() == 0 ||
-        dxlModeAlreadySet && motors[j]->getTorqueStatus() == 1)
+    if (idleModeRequested && motors[j]->getTorqueStatus() == 0 || dxlModeAlreadySet && motors[j]->getTorqueStatus() == 1)
     {
         return yarp::dev::ReturnValue_ok;
     }
 
-    if (motors[j]->getTorqueStatus() == 1 && !dxlModeAlreadySet)
+    if (motors[j]->getTorqueStatus() == 1 && (idleModeRequested || !dxlModeAlreadySet))
     {
         if (auto result = motors[j]->disableTorque(); !result.isSuccess())
         {
@@ -146,7 +149,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::Se
         }
     }
 
-    if (mode != yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE && !dxlModeAlreadySet)
+    if (!idleModeRequested && !dxlModeAlreadySet)
     {
         if (auto result = motors[j]->setOperatingMode(dxlMode); !result.isSuccess())
         {
@@ -154,6 +157,11 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlMode(int j, yarp::dev::Se
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
+        yCInfo(XCB) << "Control mode of joint" << j << "set to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+    }
+
+    if (motors[j]->getTorqueStatus() == 0 && !idleModeRequested)
+    {
         if (auto result = motors[j]->enableTorque(); !result.isSuccess())
         {
             yCError(XCB) << "Failed to enable torque:" << dynamixel::getErrorMessage(result.error());
@@ -219,12 +227,17 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
 
     if (std::all_of(modes.begin(), modes.end(), [](auto mode) { return mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE; }))
     {
+        auto decoded = static_cast<yarp::conf::vocab32_t>(yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE);
+        yCInfo(XCB) << "Control mode of all joints set to" << yarp::os::Vocab32::decode(decoded);
         return yarp::dev::ReturnValue_ok;
     }
 
     for (auto j = 0; j < joints.size(); j++)
     {
-        if (dxlModes[j] != motors[joints[j]]->getOperatingModeStatus() && modes[j] != yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE)
+        const bool idleModeRequested = modes[j] == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE;
+        const bool dxlModeAlreadySet = dxlModes[j] == motors[joints[j]]->getOperatingModeStatus();
+
+        if (!idleModeRequested && !dxlModeAlreadySet)
         {
             if (auto result = motors[joints[j]]->setOperatingMode(dxlModes[j]); !result.isSuccess())
             {
@@ -238,7 +251,9 @@ yarp::dev::ReturnValue XTrainerControlBoard::setControlModes(const std::vector<i
 
     for (auto j = 0; j < joints.size(); j++)
     {
-        if (motors[joints[j]]->getTorqueStatus() == 0 && modes[j] != yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE)
+        const bool idleModeRequested = modes[j] == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE;
+
+        if (motors[joints[j]]->getTorqueStatus() == 0 && !idleModeRequested)
         {
             executorOn->addCmd(motors[joints[j]]->stageEnableTorque());
         }
