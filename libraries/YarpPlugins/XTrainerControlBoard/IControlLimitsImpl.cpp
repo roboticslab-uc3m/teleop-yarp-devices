@@ -72,7 +72,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setVelLimits(int axis, double min, 
 
     std::lock_guard lock(mtx);
 
-    if (auto result = motors[axis]->setVelocityLimit(max); !result.isSuccess())
+    if (auto result = motors[axis]->setVelocityLimit(max / m_velocityRatio); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set velocity limit:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
@@ -100,8 +100,8 @@ yarp::dev::ReturnValue XTrainerControlBoard::getVelLimits(int axis, double * min
     }
     else
     {
-        *min = -result.value();
-        *max = result.value();
+        *min = -result.value() * m_velocityRatio;
+        *max = result.value() * m_velocityRatio;
     }
 
     return yarp::dev::ReturnValue_ok;

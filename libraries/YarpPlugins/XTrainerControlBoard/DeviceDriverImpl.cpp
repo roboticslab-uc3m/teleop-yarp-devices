@@ -55,6 +55,12 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
+    if (m_velocityRatio <= 0.0)
+    {
+        yCError(XCB) << "Invalid velocity ratio:" << m_velocityRatio;
+        return false;
+    }
+
     connector = std::make_unique<dynamixel::Connector>(m_port, m_baudrate);
 
     const auto result = connector->broadcastPing();
@@ -74,7 +80,7 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         motors.push_back(connector->createMotor(id));
     }
 
-    motors.push_back(connector->createMotor(m_extraId));
+    // motors.push_back(connector->createMotor(m_extraId));
 
     for (const auto & motor : motors)
     {

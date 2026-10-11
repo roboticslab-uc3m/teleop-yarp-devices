@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sat Oct 10 22:34:05 2026
+// Generated on: Sun Oct 11 17:54:27 2026
 
 
 #include "XTrainerControlBoard_ParamsParser.h"
@@ -52,6 +52,7 @@ std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() co
     params.push_back("motorIds");
     params.push_back("extraId");
     params.push_back("encoderPulses");
+    params.push_back("velocityRatio");
     return params;
 }
 
@@ -88,6 +89,11 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
     if (paramName =="encoderPulses")
     {
         paramValue = std::to_string(m_encoderPulses);
+        return true;
+    }
+    if (paramName =="velocityRatio")
+    {
+        paramValue = std::to_string(m_velocityRatio);
         return true;
     }
 
@@ -212,6 +218,23 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         prop_check.unput("encoderPulses");
     }
 
+    //Parser of parameter velocityRatio
+    {
+        if (config.check("velocityRatio"))
+        {
+            m_velocityRatio = config.find("velocityRatio").asFloat64();
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'velocityRatio' using value:" << m_velocityRatio;
+        }
+        else
+        {
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'velocityRatio' not found!";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Factor to apply to velocity measurements";
+            yCError(XTrainerControlBoardParamsCOMPONENT) << "Remember: Units for this parameter are: 'deg/s'";
+            return false;
+        }
+        prop_check.unput("velocityRatio");
+    }
+
     /*
     //This code check if the user set some parameter which are not check by the parser
     //If the parser is set in strict mode, this will generate an error
@@ -253,10 +276,11 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("'motorIds': Motor IDs\n");
     doc = doc + std::string("'extraId': Extra motor ID\n");
     doc = doc + std::string("'encoderPulses': Number of encoder pulses per revolution\n");
+    doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("Using only mandatory params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 3 --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;
 }

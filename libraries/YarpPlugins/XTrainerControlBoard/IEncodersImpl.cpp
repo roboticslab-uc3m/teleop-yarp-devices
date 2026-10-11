@@ -126,7 +126,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
     }
     else
     {
-        *sp = result.value() * 360.0 / m_encoderPulses;
+        *sp = result.value() * m_velocityRatio;
     }
 
     return yarp::dev::ReturnValue_ok;
@@ -154,7 +154,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
     {
         for (unsigned int i = 0; i < motors.size(); i++)
         {
-            spds[i] = result.value()[i].value() * 360.0 / m_encoderPulses;
+            spds[i] = result.value()[i].value() * m_velocityRatio;
         }
     }
 
