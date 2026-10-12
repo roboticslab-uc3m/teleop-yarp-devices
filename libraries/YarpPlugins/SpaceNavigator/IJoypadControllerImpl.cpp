@@ -34,7 +34,7 @@ namespace
 // -----------------------------------------------------------------------------
 
 #if YARP_VERSION_COMPARE(>=, 4, 0, 0)
-yarp::dev::ReturnValue getAxisCount(std::size_t & axis_count)
+yarp::dev::ReturnValue SpaceNavigator::getAxisCount(std::size_t & axis_count)
 #else
 bool SpaceNavigator::getAxisCount(unsigned int & axis_count)
 #endif
