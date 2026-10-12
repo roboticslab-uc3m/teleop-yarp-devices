@@ -14,7 +14,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosLimits(int axis, double min, 
 
     std::lock_guard lock(mtx);
 
-    if (auto result = motors[axis]->setMinPositionLimit(min * m_encoderPulses / 360.0); !result.isSuccess())
+    if (auto result = motors[axis]->setMinPositionLimit(min * m_encoderPulses / 360.0 + m_offsets[axis]); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set minimum position limit:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
@@ -22,7 +22,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosLimits(int axis, double min, 
 
     yCInfo(XCB) << "Minimum position limit set to" << min;
 
-    if (auto result = motors[axis]->setMaxPositionLimit(max * m_encoderPulses / 360.0); !result.isSuccess())
+    if (auto result = motors[axis]->setMaxPositionLimit(max * m_encoderPulses / 360.0 + m_offsets[axis]); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set maximum position limit:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
@@ -48,7 +48,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getPosLimits(int axis, double * min
     }
     else
     {
-        *min = result.value() * 360.0 / m_encoderPulses;
+        *min = result.value() * 360.0 / m_encoderPulses - m_offsets[axis];
     }
 
     if (auto result = motors[axis]->getMaxPositionLimit(); !result.isSuccess())
@@ -58,7 +58,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getPosLimits(int axis, double * min
     }
     else
     {
-        *max = result.value() * 360.0 / m_encoderPulses;
+        *max = result.value() * 360.0 / m_encoderPulses - m_offsets[axis];
     }
 
     return yarp::dev::ReturnValue_ok;

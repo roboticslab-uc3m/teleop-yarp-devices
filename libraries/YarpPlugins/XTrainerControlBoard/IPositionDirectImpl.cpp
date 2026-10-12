@@ -23,7 +23,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 
     std::lock_guard lock(mtx);
 
-    if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0); !result.isSuccess())
+    if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0 + m_offsets[j]); !result.isSuccess())
     {
         yCError(XCB) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
@@ -51,11 +51,11 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int
 
     for (auto i = 0; i < n_joint; i++)
     {
-        executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0));
+        executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0 + m_offsets[joints[i]]));
 
         if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0));
+            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
         }
     }
 

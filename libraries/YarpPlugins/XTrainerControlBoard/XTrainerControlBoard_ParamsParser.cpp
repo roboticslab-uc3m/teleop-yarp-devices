@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sun Oct 11 21:41:39 2026
+// Generated on: Mon Oct 12 16:31:49 2026
 
 
 #include "XTrainerControlBoard_ParamsParser.h"
@@ -41,6 +41,25 @@ XTrainerControlBoard_ParamsParser::XTrainerControlBoard_ParamsParser()
         }
     }
 
+    //Default value of parameteroffsets
+    {
+        m_offsets.clear();
+        yarp::os::Value tempVal;
+        tempVal.fromString(m_offsets_defaultValue.c_str());
+        yarp::os::Bottle* tempBot = tempVal.asList();
+        if (tempBot && tempBot->size()!=0)
+        {
+            for (size_t i=0; i<tempBot->size(); i++)
+            {
+                m_offsets.push_back(tempBot->get(i).asFloat64());
+            }
+        }
+        else
+        {
+             yError() <<"parameter 'offsets' is not a properly formatted bottle";
+        }
+    }
+
 }
 
 
@@ -55,6 +74,7 @@ std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() co
     params.push_back("extraOffset");
     params.push_back("encoderPulses");
     params.push_back("velocityRatio");
+    params.push_back("offsets");
     return params;
 }
 
@@ -107,6 +127,18 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
     if (paramName =="velocityRatio")
     {
         paramValue = std::to_string(m_velocityRatio);
+        return true;
+    }
+    if (paramName =="offsets")
+    {
+        std::ostringstream oss;
+        oss << "( ";
+        for (auto x : m_offsets)
+        {
+            oss << x << " ";
+        }
+        oss << " )";
+        paramValue = oss.str();
         return true;
     }
 
@@ -274,6 +306,35 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         prop_check.unput("velocityRatio");
     }
 
+    //Parser of parameter offsets
+    {
+        if (config.check("offsets"))
+        {
+            {
+                m_offsets.clear();
+                yarp::os::Bottle* tempBot = config.find("offsets").asList();
+                if (tempBot)
+                {
+                    std::string tempBots = tempBot->toString();
+                    for (size_t i=0; i<tempBot->size(); i++)
+                    {
+                        m_offsets.push_back(tempBot->get(i).asFloat64());
+                    }
+                }
+                else
+                {
+                     yCError(XTrainerControlBoardParamsCOMPONENT) <<"parameter 'offsets' is not a properly formatted bottle";
+                }
+            }
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'offsets' using value:" << m_offsets;
+        }
+        else
+        {
+            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'offsets' using DEFAULT value:" << m_offsets;
+        }
+        prop_check.unput("offsets");
+    }
+
     /*
     //This code check if the user set some parameter which are not check by the parser
     //If the parser is set in strict mode, this will generate an error
@@ -318,9 +379,10 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("'extraOffset': Offset to apply to the extra motor\n");
     doc = doc + std::string("'encoderPulses': Number of encoder pulses per revolution\n");
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
+    doc = doc + std::string("'offsets': Offsets to apply to each motor\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569\n";
+    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"\n";
     doc = doc + std::string("Using only mandatory params:\n");
     doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;

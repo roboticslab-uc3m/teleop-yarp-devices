@@ -21,22 +21,15 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAxes(std::size_t & axes)
 
 yarp::dev::ReturnValue XTrainerControlBoard::resetEncoder(int j)
 {
-    CHECK_JOINT(j);
     return setEncoder(j, 0.0);
-  }
+}
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
 {
-    bool ok = true;
-
-    for (auto i = 0; i < NUM_AXES; i++)
-    {
-        ok &= resetEncoder(i);
-    }
-
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    std::vector vals(NUM_AXES, 0.0);
+    return setEncoders(vals.data());
 }
 
 // -----------------------------------------------------------------------------
@@ -44,21 +37,23 @@ yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
 yarp::dev::ReturnValue XTrainerControlBoard::setEncoder(int j, double val)
 {
     CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    std::lock_guard lock(mtx);
+    m_offsets[j] += val;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
 {
-    bool ok = true;
+    std::lock_guard lock(mtx);
 
     for (auto i = 0; i < NUM_AXES; i++)
     {
-        ok &= setEncoder(i, vals[i]);
+        m_offsets[i] += vals[i];
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
@@ -76,7 +71,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
     }
     else
     {
-        *v = result.value() * 360.0 / m_encoderPulses;
+        *v = result.value() * 360.0 / m_encoderPulses - m_offsets[j];
     }
 
     return yarp::dev::ReturnValue_ok;
@@ -104,7 +99,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
     {
         for (auto i = 0; i < NUM_AXES; i++)
         {
-            encs[i] = result.value()[i].value() * 360.0 / m_encoderPulses;
+            encs[i] = result.value()[i].value() * 360.0 / m_encoderPulses - m_offsets[i];
         }
     }
 

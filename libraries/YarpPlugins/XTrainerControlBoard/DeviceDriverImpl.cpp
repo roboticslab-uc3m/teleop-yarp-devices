@@ -75,6 +75,12 @@ bool XTrainerControlBoard::open(yarp::os::Searchable & config)
         return false;
     }
 
+    if (m_offsets.size() != NUM_AXES)
+    {
+        yCError(XCB) << "Invalid number of offsets, expected" << NUM_AXES << "but got" << m_offsets.size();
+        return false;
+    }
+
     connector = std::make_unique<dynamixel::Connector>(m_port, m_baudrate);
 
     if (auto result = connector->broadcastPing(); result.isSuccess())
