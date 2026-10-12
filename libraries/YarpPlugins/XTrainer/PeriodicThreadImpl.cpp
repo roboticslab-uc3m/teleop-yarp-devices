@@ -2,6 +2,8 @@
 
 #include "XTrainer.hpp"
 
+#include <cmath> // std::max
+
 #include <yarp/os/LogStream.h>
 
 #include "LogComponent.hpp"
@@ -14,7 +16,7 @@ void XTrainer::run()
 
     auto executor = connector->createGroupExecutor();
 
-    for (auto i = 0; i < NUM_AXES; i++)
+    for (auto i = 0; i < NUM_MOTORS; i++)
     {
         executor->addCmd(motors[i]->stageGetPresentPosition());
     }
@@ -25,10 +27,13 @@ void XTrainer::run()
     }
     else
     {
-        for (auto i = 0; i < NUM_AXES; i++)
+        for (auto i = 0; i < NUM_MOTORS; i++)
         {
             lastJointPositions[i] = result.value()[i].value() * 360.0 / m_encoderPulses - m_offsets[i];
         }
+
+        // make the trigger range from exact 0.0
+        lastJointPositions[NUM_AXES] = std::max(lastJointPositions[NUM_AXES], 0.0);
     }
 }
 

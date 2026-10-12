@@ -31,9 +31,9 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_motorIds.size() != NUM_AXES)
+    if (m_motorIds.size() != NUM_MOTORS)
     {
-        yCError(XTR) << "Invalid number of motor IDs, expected" << NUM_AXES << "but got" << m_motorIds.size();
+        yCError(XTR) << "Invalid number of motor IDs, expected" << NUM_MOTORS << "but got" << m_motorIds.size();
         return false;
     }
 
@@ -75,9 +75,9 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_offsets.size() != NUM_AXES)
+    if (m_offsets.size() != NUM_MOTORS)
     {
-        yCError(XTR) << "Invalid number of offsets, expected" << NUM_AXES << "but got" << m_offsets.size();
+        yCError(XTR) << "Invalid number of offsets, expected" << NUM_MOTORS << "but got" << m_offsets.size();
         return false;
     }
 
@@ -107,7 +107,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
     if (m_extraId != 0)
     {
         yCInfo(XTR) << "Using extra motor with ID" << m_extraId;
-        motors.push_back(connector->createMotor(m_extraId)); // size: NUM_AXES + 1
+        motors.push_back(connector->createMotor(m_extraId)); // new size: NUM_MOTORS + 1
 
         if (m_extraReverse)
         {
@@ -124,7 +124,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
         yCInfo(XTR) << "Got motor ID" << id << "with model number" << modelNumber << "and model name" << modelName;
     }
 
-    lastJointPositions.resize(NUM_AXES);
+    lastJointPositions.resize(NUM_MOTORS);
 
     if (!yarp::os::PeriodicThread::setPeriod(m_period) || !yarp::os::PeriodicThread::start())
     {

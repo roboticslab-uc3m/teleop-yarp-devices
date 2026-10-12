@@ -14,7 +14,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
         std::vector indices = {j};
         std::vector values = {ref};
@@ -53,9 +53,9 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<int> & jnts, c
     {
         executor->addCmd(motors[jnts[i]]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
 
-        if (jnts[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        if (jnts[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
+            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
         }
     }
 

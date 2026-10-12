@@ -21,11 +21,11 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
 
     std::lock_guard lock(mtx);
 
-    if (m == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (m == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
         auto executor = connector->createGroupExecutor();
         executor->addCmd(motors[m]->stageSetGoalPWM(ref));
-        executor->addCmd(motors[NUM_AXES]->stageSetGoalPWM(ref));
+        executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPWM(ref));
 
         if (auto result = executor->executeWrite(); !result.isSuccess())
         {
@@ -57,9 +57,9 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycles(const double * refs)
     {
         executor->addCmd(motors[j]->stageSetGoalPWM(refs[j]));
 
-        if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalPWM(refs[j]));
+            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPWM(refs[j]));
         }
     }
 

@@ -26,7 +26,8 @@
 
 #include "XTrainer_ParamsParser.h"
 
-constexpr auto NUM_AXES = 6; // controlled axes
+constexpr auto NUM_AXES = 6; // controlled axes (exposed by the motor NWS), not including the trigger
+constexpr auto NUM_MOTORS = NUM_AXES + 1; // all axesincluding the trigger motor (exposed by the joypad NWS)
 constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
 
 #define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= NUM_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)

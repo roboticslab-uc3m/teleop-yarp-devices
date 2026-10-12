@@ -14,7 +14,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
         std::vector indices = {j};
         std::vector values = {ref};
@@ -53,9 +53,9 @@ yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, c
     {
         executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0 + m_offsets[joints[i]]));
 
-        if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
+            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
         }
     }
 

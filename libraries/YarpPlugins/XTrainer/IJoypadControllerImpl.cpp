@@ -2,11 +2,15 @@
 
 #include "XTrainer.hpp"
 
+#include <yarp/os/LogStream.h>
+
+#include "LogComponent.hpp"
+
 // ------------------- IJoypadController Related ------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAxisCount(std::size_t & axis_count)
 {
-    axis_count = 6;
+    axis_count = 7;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -75,7 +79,12 @@ yarp::dev::ReturnValue XTrainer::getHat(std::size_t hat_id, unsigned char & valu
 
 yarp::dev::ReturnValue XTrainer::getAxis(std::size_t axis_id, double & value)
 {
-    CHECK_JOINT(axis_id);
+    if (axis_id < 0 || axis_id >= NUM_MOTORS)
+    {
+        yCError(XTR) << "Axis ID out of bounds:" << axis_id;
+        return yarp::dev::ReturnValue_error_input_out_of_bounds;
+    }
+
     std::lock_guard lock(mtx);
     value = lastJointPositions[axis_id];
     return yarp::dev::ReturnValue_ok;

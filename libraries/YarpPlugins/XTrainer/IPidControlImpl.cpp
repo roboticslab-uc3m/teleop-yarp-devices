@@ -82,9 +82,9 @@ yarp::dev::ReturnValue XTrainer::setPid(const yarp::dev::PidControlTypeEnum & pi
 
     bool ok = setPidInternal(pidtype, j, pid);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
-        ok &= setPidInternal(pidtype, NUM_AXES, pid);
+        ok &= setPidInternal(pidtype, NUM_MOTORS, pid);
     }
 
     return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;

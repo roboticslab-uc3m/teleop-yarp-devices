@@ -121,7 +121,7 @@ yarp::dev::ReturnValue XTrainer::setControlMode(int j, yarp::dev::SelectableCont
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
         std::vector indices = {j};
         std::vector modes = {mode};
@@ -221,9 +221,9 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
         {
             executorOff->addCmd(motors[joints[j]]->stageDisableTorque());
 
-            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
             {
-                executorOff->addCmd(motors[NUM_AXES]->stageDisableTorque());
+                executorOff->addCmd(motors[NUM_MOTORS]->stageDisableTorque());
             }
         }
     }
@@ -257,9 +257,9 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
                 return yarp::dev::ReturnValue_error_method_failed;
             }
 
-            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
             {
-                if (auto result = motors[NUM_AXES]->setOperatingMode(dxlModes[j]); !result.isSuccess())
+                if (auto result = motors[NUM_MOTORS]->setOperatingMode(dxlModes[j]); !result.isSuccess())
                 {
                     yCError(XTR) << "Failed to set control mode for extra motor:" << dynamixel::getErrorMessage(result.error());
                     return yarp::dev::ReturnValue_error_method_failed;
@@ -278,9 +278,9 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
         {
             executorOn->addCmd(motors[joints[j]]->stageEnableTorque());
 
-            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+            if (joints[j] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
             {
-                executorOn->addCmd(motors[NUM_AXES]->stageEnableTorque());
+                executorOn->addCmd(motors[NUM_MOTORS]->stageEnableTorque());
             }
         }
     }
