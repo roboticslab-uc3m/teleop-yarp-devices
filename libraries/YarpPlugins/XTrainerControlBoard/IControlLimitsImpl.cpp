@@ -100,7 +100,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getVelLimits(int axis, double * min
     }
     else
     {
-        *min = -result.value() * m_velocityRatio;
+        *min = -(result.value() * m_velocityRatio);
         *max = result.value() * m_velocityRatio;
     }
 
