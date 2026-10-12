@@ -3,7 +3,7 @@ if(ENABLE_SpaceNavigator)
                  DESTINATION ${TELEOP-YARP-DEVICES_APPLICATIONS_INSTALL_DIR})
 endif()
 
-if(ENABLE_XTrainerControlBoard)
+if(ENABLE_XTrainer)
     yarp_install(DIRECTORY contexts/kinematics
                            contexts/xtrainer
                  DESTINATION ${TELEOP-YARP-DEVICES_CONTEXTS_INSTALL_DIR})

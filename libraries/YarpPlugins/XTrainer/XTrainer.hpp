@@ -1,7 +1,7 @@
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
-#ifndef __XTRAINER_CONTROL_BOARD_HPP__
-#define __XTRAINER_CONTROL_BOARD_HPP__
+#ifndef __XTRAINER_HPP__
+#define __XTRAINER_HPP__
 
 #include <memory>
 #include <mutex>
@@ -19,7 +19,7 @@
 
 #include <dynamixel_easy_sdk/dynamixel_easy_sdk.hpp>
 
-#include "XTrainerControlBoard_ParamsParser.h"
+#include "XTrainer_ParamsParser.h"
 
 constexpr auto NUM_AXES = 6; // controlled axes
 constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
@@ -28,24 +28,24 @@ constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-bas
 
 /**
  * @ingroup YarpPlugins
- * @defgroup XTrainerControlBoard
- * @brief Contains XTrainerControlBoard.
+ * @defgroup XTrainer
+ * @brief Contains XTrainer.
  */
 
 /**
- * @ingroup XTrainerControlBoard
+ * @ingroup XTrainer
  * @brief Implements several motor interfaces.
  */
-class XTrainerControlBoard : public yarp::dev::DeviceDriver,
-                             public yarp::dev::IAxisInfo,
-                             public yarp::dev::IControlLimits,
-                             public yarp::dev::IControlMode,
-                             public yarp::dev::IEncodersTimed,
-                             public yarp::dev::IPidControl,
-                             public yarp::dev::IPositionDirect,
-                             public yarp::dev::IPWMControl,
-                             public yarp::dev::IVelocityDirect,
-                             public XTrainerControlBoard_ParamsParser
+class XTrainer : public yarp::dev::DeviceDriver,
+                 public yarp::dev::IAxisInfo,
+                 public yarp::dev::IControlLimits,
+                 public yarp::dev::IControlMode,
+                 public yarp::dev::IEncodersTimed,
+                 public yarp::dev::IPidControl,
+                 public yarp::dev::IPositionDirect,
+                 public yarp::dev::IPWMControl,
+                 public yarp::dev::IVelocityDirect,
+                 public XTrainer_ParamsParser
 {
 public:
     // --------- IAxisInfo Declarations. Implementation in IAxisInfoImpl.cpp ---------
@@ -148,4 +148,4 @@ private:
     std::mutex mtx;
 };
 
-#endif // __XTRAINER_CONTROL_BOARD_HPP__
+#endif // __XTRAINER_HPP__

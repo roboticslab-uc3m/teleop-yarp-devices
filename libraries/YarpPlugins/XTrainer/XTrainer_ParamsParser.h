@@ -8,11 +8,11 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Mon Oct 12 16:31:49 2026
+// Generated on: Mon Oct 12 18:07:35 2026
 
 
-#ifndef XTRAINERCONTROLBOARD_PARAMSPARSER_H
-#define XTRAINERCONTROLBOARD_PARAMSPARSER_H
+#ifndef XTRAINER_PARAMSPARSER_H
+#define XTRAINER_PARAMSPARSER_H
 
 #include <yarp/os/Searchable.h>
 #include <yarp/dev/IDeviceDriverParams.h>
@@ -20,7 +20,7 @@
 #include <cmath>
 
 /**
-* This class is the parameters parser for class XTrainerControlBoard.
+* This class is the parameters parser for class XTrainer.
 *
 * These are the used parameters:
 * | Group name | Parameter name | Type           | Units | Default Value | Required | Description                              | Notes             |
@@ -37,24 +37,24 @@
 *
 * The device can be launched by yarpdev using one of the following examples (with and without all optional parameters):
 * \code{.unparsed}
-* yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"
+* yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"
 * \endcode
 *
 * \code{.unparsed}
-* yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569
+* yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569
 * \endcode
 *
 */
 
-class XTrainerControlBoard_ParamsParser : public yarp::dev::IDeviceDriverParams
+class XTrainer_ParamsParser : public yarp::dev::IDeviceDriverParams
 {
 public:
-    XTrainerControlBoard_ParamsParser();
-    ~XTrainerControlBoard_ParamsParser() override = default;
+    XTrainer_ParamsParser();
+    ~XTrainer_ParamsParser() override = default;
 
 public:
-    const std::string m_device_classname = {"XTrainerControlBoard"};
-    const std::string m_device_name = {"XTrainerControlBoard"};
+    const std::string m_device_classname = {"XTrainer"};
+    const std::string m_device_name = {"XTrainer"};
     bool m_parser_is_strict = false;
     struct parser_version_type
     {

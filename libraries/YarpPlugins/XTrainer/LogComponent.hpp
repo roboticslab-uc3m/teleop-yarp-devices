@@ -1,0 +1,8 @@
+#ifndef __XTRAINER_LOG_COMPONENT_HPP__
+#define __XTRAINER_LOG_COMPONENT_HPP__
+
+#include <yarp/os/LogComponent.h>
+
+YARP_DECLARE_LOG_COMPONENT(XTR)
+
+#endif // __XTRAINER_LOG_COMPONENT_HPP__

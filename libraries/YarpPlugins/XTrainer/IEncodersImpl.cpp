@@ -1,6 +1,6 @@
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
-#include "XTrainerControlBoard.hpp"
+#include "XTrainer.hpp"
 
 #include <cmath>
 
@@ -11,7 +11,7 @@
 
 // ------------------ IEncoders Related -----------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getAxes(std::size_t & axes)
+yarp::dev::ReturnValue XTrainer::getAxes(std::size_t & axes)
 {
     axes = NUM_AXES;
     return yarp::dev::ReturnValue_ok;
@@ -19,14 +19,14 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAxes(std::size_t & axes)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::resetEncoder(int j)
+yarp::dev::ReturnValue XTrainer::resetEncoder(int j)
 {
     return setEncoder(j, 0.0);
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
+yarp::dev::ReturnValue XTrainer::resetEncoders()
 {
     std::vector vals(NUM_AXES, 0.0);
     return setEncoders(vals.data());
@@ -34,7 +34,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::resetEncoders()
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setEncoder(int j, double val)
+yarp::dev::ReturnValue XTrainer::setEncoder(int j, double val)
 {
     CHECK_JOINT(j);
     std::lock_guard lock(mtx);
@@ -44,7 +44,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setEncoder(int j, double val)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
+yarp::dev::ReturnValue XTrainer::setEncoders(const double * vals)
 {
     std::lock_guard lock(mtx);
 
@@ -58,7 +58,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setEncoders(const double * vals)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
+yarp::dev::ReturnValue XTrainer::getEncoder(int j, double * v)
 {
     CHECK_JOINT(j);
 
@@ -66,7 +66,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
 
     if (auto result = motors[j]->getPresentPosition(); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to get encoder value:" << dynamixel::getErrorMessage(result.error());
+        yCError(XTR) << "Failed to get encoder value:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -79,7 +79,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoder(int j, double * v)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
+yarp::dev::ReturnValue XTrainer::getEncoders(double * encs)
 {
     std::lock_guard lock(mtx);
 
@@ -92,7 +92,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 
     if (auto result = executor->executeRead(); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
+        yCError(XTR) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -108,7 +108,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoders(double * encs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
+yarp::dev::ReturnValue XTrainer::getEncoderSpeed(int j, double * sp)
 {
     CHECK_JOINT(j);
 
@@ -116,7 +116,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
 
     if (auto result = motors[j]->getPresentVelocity(); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
+        yCError(XTR) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -129,7 +129,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeed(int j, double * sp)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
+yarp::dev::ReturnValue XTrainer::getEncoderSpeeds(double * spds)
 {
     std::lock_guard lock(mtx);
 
@@ -142,7 +142,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
 
     if (auto result = executor->executeRead(); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to get encoder speeds:" << dynamixel::getErrorMessage(result.error());
+        yCError(XTR) << "Failed to get encoder speeds:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -158,7 +158,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderSpeeds(double * spds)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAcceleration(int j, double * spds)
+yarp::dev::ReturnValue XTrainer::getEncoderAcceleration(int j, double * spds)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -166,7 +166,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAcceleration(int j, doubl
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAccelerations(double * accs)
+yarp::dev::ReturnValue XTrainer::getEncoderAccelerations(double * accs)
 {
     bool ok = true;
 
@@ -180,7 +180,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderAccelerations(double * ac
 
 // ------------------ IEncodersTimed Related -----------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncoderTimed(int j, double * encs, double * time)
+yarp::dev::ReturnValue XTrainer::getEncoderTimed(int j, double * encs, double * time)
 {
     auto ret = getEncoder(j, encs);
     *time = yarp::os::SystemClock::nowSystem();
@@ -189,7 +189,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getEncoderTimed(int j, double * enc
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getEncodersTimed(double * encs, double * time)
+yarp::dev::ReturnValue XTrainer::getEncodersTimed(double * encs, double * time)
 {
     auto ret = getEncoders(encs);
     auto now = yarp::os::SystemClock::nowSystem();
