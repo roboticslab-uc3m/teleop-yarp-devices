@@ -7,6 +7,8 @@
 #include <mutex>
 
 #include <yarp/dev/DeviceDriver.h>
+#include <yarp/dev/PolyDriver.h>
+// motor interfaces
 #include <yarp/dev/IAxisInfo.h>
 #include <yarp/dev/IControlLimits.h>
 #include <yarp/dev/IControlMode.h>
@@ -15,7 +17,8 @@
 #include <yarp/dev/IPositionDirect.h>
 #include <yarp/dev/IPWMControl.h>
 #include <yarp/dev/IVelocityDirect.h>
-#include <yarp/dev/PolyDriver.h>
+// joypad interface
+#include <yarp/dev/IJoypadController.h>
 
 #include <dynamixel_easy_sdk/dynamixel_easy_sdk.hpp>
 
@@ -37,6 +40,7 @@ constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-bas
  * @brief Implements several motor interfaces.
  */
 class XTrainer : public yarp::dev::DeviceDriver,
+                 // motor interfaces
                  public yarp::dev::IAxisInfo,
                  public yarp::dev::IControlLimits,
                  public yarp::dev::IControlMode,
@@ -45,6 +49,9 @@ class XTrainer : public yarp::dev::DeviceDriver,
                  public yarp::dev::IPositionDirect,
                  public yarp::dev::IPWMControl,
                  public yarp::dev::IVelocityDirect,
+                 // joypad interface
+                 public yarp::dev::IJoypadController,
+                 // parameter parser interface
                  public XTrainer_ParamsParser
 {
 public:
@@ -135,6 +142,21 @@ public:
     yarp::dev::ReturnValue getRefVelocity(const int jnt, double & vel) override;
     yarp::dev::ReturnValue getRefVelocity(std::vector<double> & vels) override;
     yarp::dev::ReturnValue getRefVelocity(const std::vector<int> & jnts, std::vector<double> & vels) override;
+
+    // ------- IJoypadController declarations. Implementation in IJoypadControllerImpl.cpp -------
+    yarp::dev::ReturnValue getAxisCount(std::size_t & axis_count) override;
+    yarp::dev::ReturnValue getButtonCount(std::size_t & button_count) override;
+    yarp::dev::ReturnValue getTrackballCount(std::size_t & trackball_count) override;
+    yarp::dev::ReturnValue getHatCount(std::size_t & hat_count) override;
+    yarp::dev::ReturnValue getTouchSurfaceCount(std::size_t & touch_count) override;
+    yarp::dev::ReturnValue getStickCount(std::size_t & stick_count) override;
+    yarp::dev::ReturnValue getButton(std::size_t button_id, double & value) override;
+    yarp::dev::ReturnValue getTrackball(std::size_t trackball_id, yarp::dev::TrackballData & value) override;
+    yarp::dev::ReturnValue getHat(std::size_t hat_id, unsigned char & value) override;
+    yarp::dev::ReturnValue getAxis(std::size_t axis_id, double & value) override;
+    yarp::dev::ReturnValue getAllAxes(std::vector<double> & values) override;
+    yarp::dev::ReturnValue getStick(std::size_t stick_id, yarp::dev::StickData & value, JoypadCtrl_coordinateMode coordinate_mode) override;
+    yarp::dev::ReturnValue getTouch(std::size_t touch_id, std::vector<yarp::dev::TouchData> & value) override;
 
     // -------- DeviceDriver declarations. Implementation in DeviceDriverImpl.cpp --------
     bool open(yarp::os::Searchable & config) override;

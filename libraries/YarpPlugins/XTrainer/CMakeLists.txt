@@ -25,6 +25,7 @@ if(NOT SKIP_XTrainer)
                                     IPidControlImpl.cpp
                                     IPWMControlImpl.cpp
                                     IVelocityDirectImpl.cpp
+                                    IJoypadControllerImpl.cpp
                                     XTrainer_ParamsParser.h
                                     XTrainer_ParamsParser.cpp
                                     LogComponent.hpp
