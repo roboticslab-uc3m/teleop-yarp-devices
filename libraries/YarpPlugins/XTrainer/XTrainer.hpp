@@ -6,6 +6,8 @@
 #include <memory>
 #include <mutex>
 
+#include <yarp/os/PeriodicThread.h>
+
 #include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/PolyDriver.h>
 // motor interfaces
@@ -40,6 +42,7 @@ constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-bas
  * @brief Implements several motor interfaces.
  */
 class XTrainer : public yarp::dev::DeviceDriver,
+                 public yarp::os::PeriodicThread,
                  // motor interfaces
                  public yarp::dev::IAxisInfo,
                  public yarp::dev::IControlLimits,
@@ -55,6 +58,8 @@ class XTrainer : public yarp::dev::DeviceDriver,
                  public XTrainer_ParamsParser
 {
 public:
+    XTrainer() : yarp::os::PeriodicThread(1.0, yarp::os::ShouldUseSystemClock::Yes) {}
+
     // --------- IAxisInfo Declarations. Implementation in IAxisInfoImpl.cpp ---------
     yarp::dev::ReturnValue getAxisName(int axis, std::string & name) override;
     yarp::dev::ReturnValue getJointType(int axis, yarp::dev::JointTypeEnum & type) override;
@@ -162,11 +167,15 @@ public:
     bool open(yarp::os::Searchable & config) override;
     bool close() override;
 
+protected:
+    void run() override;
+
 private:
     bool setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid);
 
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
+    std::vector<double> lastJointPositions;
     std::mutex mtx;
 };
 

@@ -6,42 +6,48 @@
 
 yarp::dev::ReturnValue XTrainer::getAxisCount(std::size_t & axis_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    axis_count = 6;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getButtonCount(std::size_t & button_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    button_count = 0;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getTrackballCount(std::size_t & trackball_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    trackball_count = 0;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getHatCount(std::size_t & hat_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    hat_count = 0;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getTouchSurfaceCount(std::size_t & touch_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    touch_count = 0;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getStickCount(std::size_t & stick_count)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    stick_count = 0;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
@@ -69,14 +75,19 @@ yarp::dev::ReturnValue XTrainer::getHat(std::size_t hat_id, unsigned char & valu
 
 yarp::dev::ReturnValue XTrainer::getAxis(std::size_t axis_id, double & value)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    CHECK_JOINT(axis_id);
+    std::lock_guard lock(mtx);
+    value = lastJointPositions[axis_id];
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAllAxes(std::vector<double> & values)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    std::lock_guard lock(mtx);
+    values = lastJointPositions;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------

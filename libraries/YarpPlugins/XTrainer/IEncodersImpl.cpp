@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#include <algorithm> // std::copy
+
 #include <yarp/os/LogStream.h>
 #include <yarp/os/SystemClock.h>
 
@@ -61,19 +63,8 @@ yarp::dev::ReturnValue XTrainer::setEncoders(const double * vals)
 yarp::dev::ReturnValue XTrainer::getEncoder(int j, double * v)
 {
     CHECK_JOINT(j);
-
     std::lock_guard lock(mtx);
-
-    if (auto result = motors[j]->getPresentPosition(); !result.isSuccess())
-    {
-        yCError(XTR) << "Failed to get encoder value:" << dynamixel::getErrorMessage(result.error());
-        return yarp::dev::ReturnValue_error_method_failed;
-    }
-    else
-    {
-        *v = result.value() * 360.0 / m_encoderPulses - m_offsets[j];
-    }
-
+    *v = lastJointPositions[j];
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -82,27 +73,7 @@ yarp::dev::ReturnValue XTrainer::getEncoder(int j, double * v)
 yarp::dev::ReturnValue XTrainer::getEncoders(double * encs)
 {
     std::lock_guard lock(mtx);
-
-    auto executor = connector->createGroupExecutor();
-
-    for (auto i = 0; i < NUM_AXES; i++)
-    {
-        executor->addCmd(motors[i]->stageGetPresentPosition());
-    }
-
-    if (auto result = executor->executeRead(); !result.isSuccess())
-    {
-        yCError(XTR) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
-        return yarp::dev::ReturnValue_error_method_failed;
-    }
-    else
-    {
-        for (auto i = 0; i < NUM_AXES; i++)
-        {
-            encs[i] = result.value()[i].value() * 360.0 / m_encoderPulses - m_offsets[i];
-        }
-    }
-
+    std::copy(lastJointPositions.begin(), lastJointPositions.end(), encs);
     return yarp::dev::ReturnValue_ok;
 }
 

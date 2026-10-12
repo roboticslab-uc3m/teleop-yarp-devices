@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Mon Oct 12 18:07:35 2026
+// Generated on: Mon Oct 12 19:47:42 2026
 
 
 #include "XTrainer_ParamsParser.h"
@@ -75,6 +75,7 @@ std::vector<std::string> XTrainer_ParamsParser::getListOfParams() const
     params.push_back("encoderPulses");
     params.push_back("velocityRatio");
     params.push_back("offsets");
+    params.push_back("period");
     return params;
 }
 
@@ -139,6 +140,11 @@ bool XTrainer_ParamsParser::getParamValue(const std::string& paramName, std::str
         }
         oss << " )";
         paramValue = oss.str();
+        return true;
+    }
+    if (paramName =="period")
+    {
+        paramValue = std::to_string(m_period);
         return true;
     }
 
@@ -335,6 +341,20 @@ bool      XTrainer_ParamsParser::parseParams(const yarp::os::Searchable & config
         prop_check.unput("offsets");
     }
 
+    //Parser of parameter period
+    {
+        if (config.check("period"))
+        {
+            m_period = config.find("period").asFloat64();
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'period' using value:" << m_period;
+        }
+        else
+        {
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'period' using DEFAULT value:" << m_period;
+        }
+        prop_check.unput("period");
+    }
+
     /*
     //This code check if the user set some parameter which are not check by the parser
     //If the parser is set in strict mode, this will generate an error
@@ -380,9 +400,10 @@ std::string      XTrainer_ParamsParser::getDocumentationOfDeviceParams() const
     doc = doc + std::string("'encoderPulses': Number of encoder pulses per revolution\n");
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("'offsets': Offsets to apply to each motor\n");
+    doc = doc + std::string("'period': Period of the encoder acquisition loop\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"\n";
+    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \" --period 0.01\n";
     doc = doc + std::string("Using only mandatory params:\n");
     doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;

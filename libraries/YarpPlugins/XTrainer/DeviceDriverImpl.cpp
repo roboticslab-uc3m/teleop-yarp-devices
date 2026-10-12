@@ -81,6 +81,12 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
+    if (m_period <= 0.0)
+    {
+        yCError(XTR) << "Invalid period:" << m_period;
+        return false;
+    }
+
     connector = std::make_unique<dynamixel::Connector>(m_port, m_baudrate);
 
     if (auto result = connector->broadcastPing(); result.isSuccess())
@@ -118,6 +124,14 @@ bool XTrainer::open(yarp::os::Searchable & config)
         yCInfo(XTR) << "Got motor ID" << id << "with model number" << modelNumber << "and model name" << modelName;
     }
 
+    lastJointPositions.resize(NUM_AXES);
+
+    if (!yarp::os::PeriodicThread::setPeriod(m_period) || !yarp::os::PeriodicThread::start())
+    {
+        yCError(XTR) << "Failed to start periodic thread with period:" << m_period;
+        return false;
+    }
+
     return true;
 }
 
@@ -125,6 +139,11 @@ bool XTrainer::open(yarp::os::Searchable & config)
 
 bool XTrainer::close()
 {
+    if (yarp::os::PeriodicThread::isRunning())
+    {
+        yarp::os::PeriodicThread::stop();
+    }
+
     if (connector)
     {
         connector->closePort();

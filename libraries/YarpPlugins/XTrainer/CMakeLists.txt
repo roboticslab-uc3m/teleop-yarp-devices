@@ -17,6 +17,7 @@ if(NOT SKIP_XTrainer)
 
     target_sources(XTrainer PRIVATE XTrainer.hpp
                                     DeviceDriverImpl.cpp
+                                    PeriodicThreadImpl.cpp
                                     IAxisInfoImpl.cpp
                                     IControlLimitsImpl.cpp
                                     IControlModeImpl.cpp

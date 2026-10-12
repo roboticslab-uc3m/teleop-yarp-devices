@@ -9,3 +9,4 @@
 |       | encoderPulses | int            |           | 4096          | yes      | Number of encoder pulses per revolution  | check .model file |
 |       | velocityRatio | double         | deg/s     | 1.373329569   | yes      | Factor to apply to velocity measurements | check .model file |
 |       | offsets       | vector<double> | deg       | 0 0 0 0 0 0   | no       | Offsets to apply to each motor           |                   |
+|       | period        | double         | s         | 0.01          | no       | Period of the encoder acquisition loop   |                   |
