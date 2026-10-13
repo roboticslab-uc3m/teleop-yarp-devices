@@ -27,7 +27,7 @@ void XTrainer::run()
 
     if (auto result = executor->executeRead(); !result.isSuccess())
     {
-        yCErrorThrottle(XTR, THROTTLE) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
+        yCIErrorThrottle(XTR, id(), THROTTLE) << "Failed to get encoders:" << dynamixel::getErrorMessage(result.error());
     }
     else
     {
@@ -51,7 +51,7 @@ void XTrainer::run()
 
     if (ret <= 0)
     {
-        yCErrorThrottle(XTR, THROTTLE) << "Failed to write to port for retrieving button state";
+        yCIErrorThrottle(XTR, id(), THROTTLE) << "Failed to write to port for retrieving button state";
     }
 
     portHandler->setPacketTimeout(static_cast<std::uint16_t>(2)); // packet length
@@ -73,7 +73,7 @@ void XTrainer::run()
     }
     else
     {
-        yCWarningThrottle(XTR, THROTTLE) << "Invalid button state received:" << rxBuffer[0] << rxBuffer[1] << ret;
+        yCIWarningThrottle(XTR, id(), THROTTLE) << "Invalid button state received:" << rxBuffer[0] << rxBuffer[1] << ret;
     }
 }
 

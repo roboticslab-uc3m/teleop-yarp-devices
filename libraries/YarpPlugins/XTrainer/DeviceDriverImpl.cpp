@@ -13,77 +13,83 @@
 
 bool XTrainer::open(yarp::os::Searchable & config)
 {
+    if (yarp::dev::DeviceDriver::id() == "XTrainer")
+    {
+        // avoid verbose log if using default ID (i.e., if not invoked via yarprobotinterface)
+        yarp::dev::DeviceDriver::setId("");
+    }
+
     if (!parseParams(config))
     {
-        yCError(XTR) << "Could not parse parameters";
+        yCIError(XTR, id()) << "Could not parse parameters";
         return false;
     }
 
     if (m_port.empty())
     {
-        yCError(XTR) << "Invalid empty serial port";
+        yCIError(XTR, id()) << "Invalid empty serial port";
         return false;
     }
 
     if (m_baudrate <= 0)
     {
-        yCError(XTR) << "Invalid baudrate:" << m_baudrate;
+        yCIError(XTR, id()) << "Invalid baudrate:" << m_baudrate;
         return false;
     }
 
     if (m_motorIds.size() != NUM_MOTORS)
     {
-        yCError(XTR) << "Invalid number of motor IDs, expected" << NUM_MOTORS << "but got" << m_motorIds.size();
+        yCIError(XTR, id()) << "Invalid number of motor IDs, expected" << NUM_MOTORS << "but got" << m_motorIds.size();
         return false;
     }
 
     if (std::unordered_set(m_motorIds.begin(), m_motorIds.end()).size() != m_motorIds.size())
     {
-        yCError(XTR) << "Duplicate motor IDs found in the list";
+        yCIError(XTR, id()) << "Duplicate motor IDs found in the list";
         return false;
     }
 
-    for (const auto & id : m_motorIds)
+    for (const auto & motorId : m_motorIds)
     {
-        if (id <= 0)
+        if (motorId <= 0)
         {
-            yCError(XTR) << "Invalid motor ID in the list:" << id;
+            yCIError(XTR, id()) << "Invalid motor ID in the list:" << motorId;
             return false;
         }
     }
 
     if (m_extraId < 0)
     {
-        yCError(XTR) << "Invalid extra motor ID:" << m_extraId;
+        yCIError(XTR, id()) << "Invalid extra motor ID:" << m_extraId;
         return false;
     }
     else if (m_extraId != 0 && std::find(m_motorIds.begin(), m_motorIds.end(), m_extraId) != m_motorIds.end())
     {
-        yCError(XTR) << "Extra motor ID" << m_extraId << "is already in the list of motor IDs";
+        yCIError(XTR, id()) << "Extra motor ID" << m_extraId << "is already in the list of motor IDs";
         return false;
     }
 
     if (m_encoderPulses <= 0)
     {
-        yCError(XTR) << "Invalid number of encoder pulses:" << m_encoderPulses;
+        yCIError(XTR, id()) << "Invalid number of encoder pulses:" << m_encoderPulses;
         return false;
     }
 
     if (m_velocityRatio <= 0.0)
     {
-        yCError(XTR) << "Invalid velocity ratio:" << m_velocityRatio;
+        yCIError(XTR, id()) << "Invalid velocity ratio:" << m_velocityRatio;
         return false;
     }
 
     if (m_offsets.size() != NUM_MOTORS)
     {
-        yCError(XTR) << "Invalid number of offsets, expected" << NUM_MOTORS << "but got" << m_offsets.size();
+        yCIError(XTR, id()) << "Invalid number of offsets, expected" << NUM_MOTORS << "but got" << m_offsets.size();
         return false;
     }
 
     if (m_period <= 0.0)
     {
-        yCError(XTR) << "Invalid period:" << m_period;
+        yCIError(XTR, id()) << "Invalid period:" << m_period;
         return false;
     }
 
@@ -91,11 +97,11 @@ bool XTrainer::open(yarp::os::Searchable & config)
 
     if (auto result = connector->broadcastPing(); result.isSuccess())
     {
-        yCInfo(XTR) << "Broadcast ping successful, got IDs:" << result.value();
+        yCIInfo(XTR, id()) << "Broadcast ping successful, got IDs:" << result.value();
     }
     else
     {
-        yCError(XTR) << "Broadcast ping failed:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Broadcast ping failed:" << dynamixel::getErrorMessage(result.error());
         return false;
     }
 
@@ -106,7 +112,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
 
     if (m_extraId != 0)
     {
-        yCInfo(XTR) << "Using extra motor with ID" << m_extraId;
+        yCIInfo(XTR, id()) << "Using extra motor with ID" << m_extraId;
         motors.push_back(connector->createMotor(m_extraId)); // new size: NUM_MOTORS + 1
 
         if (m_extraReverse)
@@ -117,11 +123,11 @@ bool XTrainer::open(yarp::os::Searchable & config)
 
     for (const auto & motor : motors)
     {
-        auto id = motor->getID();
+        auto motorId = motor->getID();
         auto modelNumber = motor->getModelNumber();
         auto modelName = motor->getModelName();
 
-        yCInfo(XTR) << "Got motor ID" << id << "with model number" << modelNumber << "and model name" << modelName;
+        yCIInfo(XTR, id()) << "Got motor ID" << motorId << "with model number" << modelNumber << "and model name" << modelName;
     }
 
     lastJointPositions.resize(NUM_MOTORS);
@@ -129,7 +135,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
 
     if (!yarp::os::PeriodicThread::setPeriod(m_period) || !yarp::os::PeriodicThread::start())
     {
-        yCError(XTR) << "Failed to start periodic thread with period:" << m_period;
+        yCIError(XTR, id()) << "Failed to start periodic thread with period:" << m_period;
         return false;
     }
 

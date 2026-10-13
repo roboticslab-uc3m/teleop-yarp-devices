@@ -60,7 +60,7 @@ yarp::dev::ReturnValue XTrainer::getButton(std::size_t button_id, double & value
 {
     if (button_id < 0 || button_id >= NUM_BUTTONS)
     {
-        yCError(XTR) << "Button ID out of bounds:" << button_id;
+        yCIError(XTR, id()) << "Button ID out of bounds:" << button_id;
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
@@ -88,7 +88,7 @@ yarp::dev::ReturnValue XTrainer::getAxis(std::size_t axis_id, double & value)
 {
     if (axis_id < 0 || axis_id >= NUM_MOTORS)
     {
-        yCError(XTR) << "Axis ID out of bounds:" << axis_id;
+        yCIError(XTR, id()) << "Axis ID out of bounds:" << axis_id;
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 

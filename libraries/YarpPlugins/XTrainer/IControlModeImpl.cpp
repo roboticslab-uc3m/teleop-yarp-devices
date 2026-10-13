@@ -130,11 +130,11 @@ yarp::dev::ReturnValue XTrainer::setControlMode(int j, yarp::dev::SelectableCont
 
     if (std::find(availableControlModes.begin(), availableControlModes.end(), mode) == availableControlModes.end())
     {
-        yCError(XTR) << "Control mode not available:" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+        yCIError(XTR, id()) << "Control mode not available:" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
-    yCDebug(XTR) << "Setting control mode of joint" << j << "to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+    yCIDebug(XTR, id()) << "Setting control mode of joint" << j << "to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
 
     std::lock_guard lock(mtx);
 
@@ -151,7 +151,7 @@ yarp::dev::ReturnValue XTrainer::setControlMode(int j, yarp::dev::SelectableCont
     {
         if (auto result = motors[j]->disableTorque(); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to disable torque:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to disable torque:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }
@@ -160,18 +160,18 @@ yarp::dev::ReturnValue XTrainer::setControlMode(int j, yarp::dev::SelectableCont
     {
         if (auto result = motors[j]->setOperatingMode(dxlMode); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
-        yCInfo(XTR) << "Control mode of joint" << j << "set to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+        yCIInfo(XTR, id()) << "Control mode of joint" << j << "set to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
     }
 
     if (motors[j]->getTorqueStatus() == 0 && !idleModeRequested)
     {
         if (auto result = motors[j]->enableTorque(); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to enable torque:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to enable torque:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }
@@ -196,7 +196,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
     {
         if (std::find(availableControlModes.begin(), availableControlModes.end(), mode) == availableControlModes.end())
         {
-            yCError(XTR) << "Control mode not available:" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
+            yCIError(XTR, id()) << "Control mode not available:" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
             return yarp::dev::ReturnValue_error_input_out_of_bounds;
         }
     }
@@ -232,7 +232,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
     {
         if (auto result = executorOff->executeWrite(); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to disable torque (staged):" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to disable torque (staged):" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }
@@ -240,7 +240,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
     if (std::all_of(modes.begin(), modes.end(), [](auto mode) { return mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE; }))
     {
         auto decoded = static_cast<yarp::conf::vocab32_t>(yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE);
-        yCInfo(XTR) << "Control mode of all selected joints set to" << yarp::os::Vocab32::decode(decoded);
+        yCIInfo(XTR, id()) << "Control mode of all selected joints set to" << yarp::os::Vocab32::decode(decoded);
         return yarp::dev::ReturnValue_ok;
     }
 
@@ -253,7 +253,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
         {
             if (auto result = motors[joints[j]]->setOperatingMode(dxlModes[j]); !result.isSuccess())
             {
-                yCError(XTR) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
+                yCIError(XTR, id()) << "Failed to set control mode:" << dynamixel::getErrorMessage(result.error());
                 return yarp::dev::ReturnValue_error_method_failed;
             }
 
@@ -261,7 +261,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
             {
                 if (auto result = motors[NUM_MOTORS]->setOperatingMode(dxlModes[j]); !result.isSuccess())
                 {
-                    yCError(XTR) << "Failed to set control mode for extra motor:" << dynamixel::getErrorMessage(result.error());
+                    yCIError(XTR, id()) << "Failed to set control mode for extra motor:" << dynamixel::getErrorMessage(result.error());
                     return yarp::dev::ReturnValue_error_method_failed;
                 }
             }
@@ -289,7 +289,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
     {
         if (auto result = executorOn->executeWrite(); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to enable torque (staged):" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to enable torque (staged):" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }

@@ -25,7 +25,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 
     if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0 + m_offsets[j]); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -34,7 +34,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPositions(const double * refs)
+yarp::dev::ReturnValue XTrainer::setPositions(const double *refs)
 {
     std::vector<int> indices(NUM_AXES);
     std::iota(indices.begin(), indices.end(), 0);
@@ -43,7 +43,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(const double * refs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, const double * refs)
+yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int *joints, const double *refs)
 {
     std::lock_guard lock(mtx);
 
@@ -61,7 +61,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, c
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to set positions:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set positions:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -70,7 +70,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, c
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double * ref)
+yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double *ref)
 {
     CHECK_JOINT(joint);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -78,7 +78,7 @@ yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double * ref)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPositions(double * refs)
+yarp::dev::ReturnValue XTrainer::getRefPositions(double *refs)
 {
     bool ok = true;
 
@@ -92,7 +92,7 @@ yarp::dev::ReturnValue XTrainer::getRefPositions(double * refs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPositions(int n_joint, const int * joints, double * refs)
+yarp::dev::ReturnValue XTrainer::getRefPositions(int n_joint, const int *joints, double *refs)
 {
     bool ok = true;
 

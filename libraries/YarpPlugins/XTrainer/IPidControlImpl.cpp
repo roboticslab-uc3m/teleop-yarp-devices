@@ -8,21 +8,20 @@
 
 // ------------------- IPidControl Related --------------------------------
 
-yarp::dev::ReturnValue XTrainer::getAvailablePids(int j, std::vector<yarp::dev::PidControlTypeEnum> & avail)
+yarp::dev::ReturnValue XTrainer::getAvailablePids(int j, std::vector<yarp::dev::PidControlTypeEnum> &avail)
 {
     CHECK_JOINT(j);
 
     avail = {
         yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_POSITION,
-        yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY
-    };
+        yarp::dev::PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY};
 
     return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
-bool XTrainer::setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid)
+bool XTrainer::setPidInternal(const yarp::dev::PidControlTypeEnum &pidtype, int j, const yarp::dev::Pid &pid)
 {
     switch (pidtype)
     {
@@ -30,19 +29,19 @@ bool XTrainer::setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int
     {
         if (auto result = motors[j]->setPositionPGain(pid.kp); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set position P gain:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set position P gain:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
         if (auto result = motors[j]->setPositionIGain(pid.ki); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set position I gain:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set position I gain:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
         if (auto result = motors[j]->setPositionDGain(pid.kd); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set position D gain:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set position D gain:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
@@ -52,20 +51,20 @@ bool XTrainer::setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int
     {
         if (auto result = motors[j]->setVelocityPGain(pid.kp); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set velocity P gain:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set velocity P gain:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
         if (auto result = motors[j]->setVelocityIGain(pid.ki); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set velocity I gain:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set velocity I gain:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
 
         break;
     }
     default:
-        yCError(XTR) << "Invalid PID type";
+        yCIError(XTR, id()) << "Invalid PID type";
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
@@ -74,7 +73,7 @@ bool XTrainer::setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPid(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid)
+yarp::dev::ReturnValue XTrainer::setPid(const yarp::dev::PidControlTypeEnum &pidtype, int j, const yarp::dev::Pid &pid)
 {
     CHECK_JOINT(j);
 
@@ -92,7 +91,7 @@ yarp::dev::ReturnValue XTrainer::setPid(const yarp::dev::PidControlTypeEnum & pi
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPids(const yarp::dev::PidControlTypeEnum & pidtype, const yarp::dev::Pid * pids)
+yarp::dev::ReturnValue XTrainer::setPids(const yarp::dev::PidControlTypeEnum &pidtype, const yarp::dev::Pid *pids)
 {
     bool ok = true;
 
@@ -106,7 +105,7 @@ yarp::dev::ReturnValue XTrainer::setPids(const yarp::dev::PidControlTypeEnum & p
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPidReference(const yarp::dev::PidControlTypeEnum & pidtype, int j, double ref)
+yarp::dev::ReturnValue XTrainer::setPidReference(const yarp::dev::PidControlTypeEnum &pidtype, int j, double ref)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -114,29 +113,14 @@ yarp::dev::ReturnValue XTrainer::setPidReference(const yarp::dev::PidControlType
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPidReferences(const yarp::dev::PidControlTypeEnum & pidtype, const double * refs)
+yarp::dev::ReturnValue XTrainer::setPidReferences(const yarp::dev::PidControlTypeEnum &pidtype, const double *refs)
 {
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPidErrorLimit(const yarp::dev::PidControlTypeEnum & pidtype, int j, double limit)
-{
-    CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::setPidErrorLimits(const yarp::dev::PidControlTypeEnum & pidtype, const double * limits)
-{
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPidError(const yarp::dev::PidControlTypeEnum & pidtype, int j, double * err)
+yarp::dev::ReturnValue XTrainer::setPidErrorLimit(const yarp::dev::PidControlTypeEnum &pidtype, int j, double limit)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -144,29 +128,14 @@ yarp::dev::ReturnValue XTrainer::getPidError(const yarp::dev::PidControlTypeEnum
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidErrors(const yarp::dev::PidControlTypeEnum & pidtype, double * errs)
+yarp::dev::ReturnValue XTrainer::setPidErrorLimits(const yarp::dev::PidControlTypeEnum &pidtype, const double *limits)
 {
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidOutput(const yarp::dev::PidControlTypeEnum & pidtype, int j, double * out)
-{
-    CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPidOutputs(const yarp::dev::PidControlTypeEnum & pidtype, double * outs)
-{
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPid(const yarp::dev::PidControlTypeEnum & pidtype, int j, yarp::dev::Pid * pid)
+yarp::dev::ReturnValue XTrainer::getPidError(const yarp::dev::PidControlTypeEnum &pidtype, int j, double *err)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -174,22 +143,14 @@ yarp::dev::ReturnValue XTrainer::getPid(const yarp::dev::PidControlTypeEnum & pi
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPids(const yarp::dev::PidControlTypeEnum & pidtype, yarp::dev::Pid * pids)
+yarp::dev::ReturnValue XTrainer::getPidErrors(const yarp::dev::PidControlTypeEnum &pidtype, double *errs)
 {
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidOffset(const yarp::dev::PidControlTypeEnum & pidtype, int j, double & v)
-{
-    CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPidFeedforward(const yarp::dev::PidControlTypeEnum & pidtype, int j, double & v)
+yarp::dev::ReturnValue XTrainer::getPidOutput(const yarp::dev::PidControlTypeEnum &pidtype, int j, double *out)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -197,7 +158,14 @@ yarp::dev::ReturnValue XTrainer::getPidFeedforward(const yarp::dev::PidControlTy
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidExtraInfo(const yarp::dev::PidControlTypeEnum & pidtype, int j, yarp::dev::PidExtraInfo & info)
+yarp::dev::ReturnValue XTrainer::getPidOutputs(const yarp::dev::PidControlTypeEnum &pidtype, double *outs)
+{
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::getPid(const yarp::dev::PidControlTypeEnum &pidtype, int j, yarp::dev::Pid *pid)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -205,29 +173,14 @@ yarp::dev::ReturnValue XTrainer::getPidExtraInfo(const yarp::dev::PidControlType
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidExtraInfos(const yarp::dev::PidControlTypeEnum & pidtype, std::vector<yarp::dev::PidExtraInfo> & info)
+yarp::dev::ReturnValue XTrainer::getPids(const yarp::dev::PidControlTypeEnum &pidtype, yarp::dev::Pid *pids)
 {
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidReference(const yarp::dev::PidControlTypeEnum & pidtype, int j, double * ref)
-{
-    CHECK_JOINT(j);
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPidReferences(const yarp::dev::PidControlTypeEnum & pidtype, double * refs)
-{
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::getPidErrorLimit(const yarp::dev::PidControlTypeEnum & pidtype, int j, double * limit)
+yarp::dev::ReturnValue XTrainer::getPidOffset(const yarp::dev::PidControlTypeEnum &pidtype, int j, double &v)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -235,14 +188,7 @@ yarp::dev::ReturnValue XTrainer::getPidErrorLimit(const yarp::dev::PidControlTyp
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getPidErrorLimits(const yarp::dev::PidControlTypeEnum & pidtype, double * limits)
-{
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
-}
-
-// -----------------------------------------------------------------------------
-
-yarp::dev::ReturnValue XTrainer::resetPid(const yarp::dev::PidControlTypeEnum & pidtype, int j)
+yarp::dev::ReturnValue XTrainer::getPidFeedforward(const yarp::dev::PidControlTypeEnum &pidtype, int j, double &v)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -250,7 +196,7 @@ yarp::dev::ReturnValue XTrainer::resetPid(const yarp::dev::PidControlTypeEnum & 
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::disablePid(const yarp::dev::PidControlTypeEnum & pidtype, int j)
+yarp::dev::ReturnValue XTrainer::getPidExtraInfo(const yarp::dev::PidControlTypeEnum &pidtype, int j, yarp::dev::PidExtraInfo &info)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -258,7 +204,14 @@ yarp::dev::ReturnValue XTrainer::disablePid(const yarp::dev::PidControlTypeEnum 
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::enablePid(const yarp::dev::PidControlTypeEnum & pidtype, int j)
+yarp::dev::ReturnValue XTrainer::getPidExtraInfos(const yarp::dev::PidControlTypeEnum &pidtype, std::vector<yarp::dev::PidExtraInfo> &info)
+{
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::getPidReference(const yarp::dev::PidControlTypeEnum &pidtype, int j, double *ref)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -266,7 +219,14 @@ yarp::dev::ReturnValue XTrainer::enablePid(const yarp::dev::PidControlTypeEnum &
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPidOffset(const yarp::dev::PidControlTypeEnum & pidtype, int j, double v)
+yarp::dev::ReturnValue XTrainer::getPidReferences(const yarp::dev::PidControlTypeEnum &pidtype, double *refs)
+{
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::getPidErrorLimit(const yarp::dev::PidControlTypeEnum &pidtype, int j, double *limit)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -274,7 +234,14 @@ yarp::dev::ReturnValue XTrainer::setPidOffset(const yarp::dev::PidControlTypeEnu
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPidFeedforward(const yarp::dev::PidControlTypeEnum & pidtype, int j, double v)
+yarp::dev::ReturnValue XTrainer::getPidErrorLimits(const yarp::dev::PidControlTypeEnum &pidtype, double *limits)
+{
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::resetPid(const yarp::dev::PidControlTypeEnum &pidtype, int j)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -282,7 +249,39 @@ yarp::dev::ReturnValue XTrainer::setPidFeedforward(const yarp::dev::PidControlTy
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::isPidEnabled(const yarp::dev::PidControlTypeEnum & pidtype, int j, bool & enabled)
+yarp::dev::ReturnValue XTrainer::disablePid(const yarp::dev::PidControlTypeEnum &pidtype, int j)
+{
+    CHECK_JOINT(j);
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::enablePid(const yarp::dev::PidControlTypeEnum &pidtype, int j)
+{
+    CHECK_JOINT(j);
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::setPidOffset(const yarp::dev::PidControlTypeEnum &pidtype, int j, double v)
+{
+    CHECK_JOINT(j);
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::setPidFeedforward(const yarp::dev::PidControlTypeEnum &pidtype, int j, double v)
+{
+    CHECK_JOINT(j);
+    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+}
+
+// -----------------------------------------------------------------------------
+
+yarp::dev::ReturnValue XTrainer::isPidEnabled(const yarp::dev::PidControlTypeEnum &pidtype, int j, bool &enabled)
 {
     CHECK_JOINT(j);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;

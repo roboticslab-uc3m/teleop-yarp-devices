@@ -25,7 +25,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 
     if (auto result = motors[j]->setGoalVelocity(ref / m_velocityRatio); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to set velocity:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set velocity:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -61,7 +61,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<int> & jnts, c
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to set velocities:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set velocities:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 

@@ -29,7 +29,7 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
 
         if (auto result = executor->executeWrite(); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set PWM duty cycle for dual-motor axis:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set PWM duty cycle for dual-motor axis:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }
@@ -37,7 +37,7 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
     {
         if (auto result = motors[m]->setGoalPWM(ref); !result.isSuccess())
         {
-            yCError(XTR) << "Failed to set PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
+            yCIError(XTR, id()) << "Failed to set PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
             return yarp::dev::ReturnValue_error_method_failed;
         }
     }
@@ -65,7 +65,7 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycles(const double * refs)
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to set PWM duty cycles:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set PWM duty cycles:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -104,7 +104,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycle(int m, double * val)
 
     if (auto result = motors[m]->getPresentPWM(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to get PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to get PWM duty cycle:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -130,7 +130,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycles(double * vals)
 
     if (auto result = executor->executeRead(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to get PWM duty cycles:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to get PWM duty cycles:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else

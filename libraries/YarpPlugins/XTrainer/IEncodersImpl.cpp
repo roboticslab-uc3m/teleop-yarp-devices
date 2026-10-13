@@ -87,7 +87,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeed(int j, double * sp)
 
     if (auto result = motors[j]->getPresentVelocity(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to get encoder speed:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
@@ -113,7 +113,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeeds(double * spds)
 
     if (auto result = executor->executeRead(); !result.isSuccess())
     {
-        yCError(XTR) << "Failed to get encoder speeds:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to get encoder speeds:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
     else
