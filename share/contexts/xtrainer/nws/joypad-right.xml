@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<device name="joypadControl_nws_right" type="JoypadControl_nws_yarp">
+    <param name="name">${portprefix}/joypad/right</param>
+    <param name="period">0.01</param>
+    <action phase="startup" level="10" type="attach">
+        <param name="device">xtrainer_right</param>
+    </action>
+    <action phase="shutdown" level="20" type="detach" />
+</device>
