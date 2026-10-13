@@ -8,19 +8,19 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Mon Oct 12 16:31:49 2026
+// Generated on: Mon Oct 12 21:50:01 2026
 
 
-#include "XTrainerControlBoard_ParamsParser.h"
+#include "XTrainer_ParamsParser.h"
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Value.h>
 
 namespace {
-    YARP_LOG_COMPONENT(XTrainerControlBoardParamsCOMPONENT, "yarp.device.XTrainerControlBoard")
+    YARP_LOG_COMPONENT(XTrainerParamsCOMPONENT, "yarp.device.XTrainer")
 }
 
 
-XTrainerControlBoard_ParamsParser::XTrainerControlBoard_ParamsParser()
+XTrainer_ParamsParser::XTrainer_ParamsParser()
 {
     //Default value of parametermotorIds
     {
@@ -63,7 +63,7 @@ XTrainerControlBoard_ParamsParser::XTrainerControlBoard_ParamsParser()
 }
 
 
-std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() const
+std::vector<std::string> XTrainer_ParamsParser::getListOfParams() const
 {
     std::vector<std::string> params;
     params.push_back("port");
@@ -75,11 +75,12 @@ std::vector<std::string> XTrainerControlBoard_ParamsParser::getListOfParams() co
     params.push_back("encoderPulses");
     params.push_back("velocityRatio");
     params.push_back("offsets");
+    params.push_back("period");
     return params;
 }
 
 
-bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramName, std::string& paramValue) const
+bool XTrainer_ParamsParser::getParamValue(const std::string& paramName, std::string& paramValue) const
 {
     if (paramName =="port")
     {
@@ -141,6 +142,11 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
         paramValue = oss.str();
         return true;
     }
+    if (paramName =="period")
+    {
+        paramValue = std::to_string(m_period);
+        return true;
+    }
 
     yError() <<"parameter '" << paramName << "' was not found";
     return false;
@@ -148,7 +154,7 @@ bool XTrainerControlBoard_ParamsParser::getParamValue(const std::string& paramNa
 }
 
 
-std::string XTrainerControlBoard_ParamsParser::getConfiguration() const
+std::string XTrainer_ParamsParser::getConfiguration() const
 {
     //This is a sub-optimal solution.
     //Ideally getConfiguration() should return all parameters but it is currently
@@ -158,12 +164,12 @@ std::string XTrainerControlBoard_ParamsParser::getConfiguration() const
     return s_cfg;
 }
 
-bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searchable & config)
+bool      XTrainer_ParamsParser::parseParams(const yarp::os::Searchable & config)
 {
     //Check for --help option
     if (config.check("help"))
     {
-        yCInfo(XTrainerControlBoardParamsCOMPONENT) << getDocumentationOfDeviceParams();
+        yCInfo(XTrainerParamsCOMPONENT) << getDocumentationOfDeviceParams();
     }
 
     m_provided_configuration = config.toString();
@@ -173,12 +179,12 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("port"))
         {
             m_port = config.find("port").asString();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'port' using value:" << m_port;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'port' using value:" << m_port;
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'port' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Name of the serial port";
+            yCError(XTrainerParamsCOMPONENT) << "Mandatory parameter 'port' not found!";
+            yCError(XTrainerParamsCOMPONENT) << "Description of the parameter: Name of the serial port";
             return false;
         }
         prop_check.unput("port");
@@ -189,12 +195,12 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("baudrate"))
         {
             m_baudrate = config.find("baudrate").asInt64();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'baudrate' using value:" << m_baudrate;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'baudrate' using value:" << m_baudrate;
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'baudrate' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Baud rate of the serial port";
+            yCError(XTrainerParamsCOMPONENT) << "Mandatory parameter 'baudrate' not found!";
+            yCError(XTrainerParamsCOMPONENT) << "Description of the parameter: Baud rate of the serial port";
             return false;
         }
         prop_check.unput("baudrate");
@@ -217,15 +223,15 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
                 }
                 else
                 {
-                     yCError(XTrainerControlBoardParamsCOMPONENT) <<"parameter 'motorIds' is not a properly formatted bottle";
+                     yCError(XTrainerParamsCOMPONENT) <<"parameter 'motorIds' is not a properly formatted bottle";
                 }
             }
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'motorIds' using value:" << m_motorIds;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'motorIds' using value:" << m_motorIds;
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'motorIds' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Motor IDs";
+            yCError(XTrainerParamsCOMPONENT) << "Mandatory parameter 'motorIds' not found!";
+            yCError(XTrainerParamsCOMPONENT) << "Description of the parameter: Motor IDs";
             return false;
         }
         prop_check.unput("motorIds");
@@ -236,11 +242,11 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("extraId"))
         {
             m_extraId = config.find("extraId").asInt64();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraId' using value:" << m_extraId;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraId' using value:" << m_extraId;
         }
         else
         {
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraId' using DEFAULT value:" << m_extraId;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraId' using DEFAULT value:" << m_extraId;
         }
         prop_check.unput("extraId");
     }
@@ -250,11 +256,11 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("extraReverse"))
         {
             m_extraReverse = config.find("extraReverse").asBool();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraReverse' using value:" << m_extraReverse;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraReverse' using value:" << m_extraReverse;
         }
         else
         {
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraReverse' using DEFAULT value:" << m_extraReverse;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraReverse' using DEFAULT value:" << m_extraReverse;
         }
         prop_check.unput("extraReverse");
     }
@@ -264,11 +270,11 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("extraOffset"))
         {
             m_extraOffset = config.find("extraOffset").asFloat64();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraOffset' using value:" << m_extraOffset;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraOffset' using value:" << m_extraOffset;
         }
         else
         {
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'extraOffset' using DEFAULT value:" << m_extraOffset;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'extraOffset' using DEFAULT value:" << m_extraOffset;
         }
         prop_check.unput("extraOffset");
     }
@@ -278,12 +284,12 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("encoderPulses"))
         {
             m_encoderPulses = config.find("encoderPulses").asInt64();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'encoderPulses' using value:" << m_encoderPulses;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'encoderPulses' using value:" << m_encoderPulses;
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'encoderPulses' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Number of encoder pulses per revolution";
+            yCError(XTrainerParamsCOMPONENT) << "Mandatory parameter 'encoderPulses' not found!";
+            yCError(XTrainerParamsCOMPONENT) << "Description of the parameter: Number of encoder pulses per revolution";
             return false;
         }
         prop_check.unput("encoderPulses");
@@ -294,13 +300,13 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         if (config.check("velocityRatio"))
         {
             m_velocityRatio = config.find("velocityRatio").asFloat64();
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'velocityRatio' using value:" << m_velocityRatio;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'velocityRatio' using value:" << m_velocityRatio;
         }
         else
         {
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Mandatory parameter 'velocityRatio' not found!";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Description of the parameter: Factor to apply to velocity measurements";
-            yCError(XTrainerControlBoardParamsCOMPONENT) << "Remember: Units for this parameter are: 'deg/s'";
+            yCError(XTrainerParamsCOMPONENT) << "Mandatory parameter 'velocityRatio' not found!";
+            yCError(XTrainerParamsCOMPONENT) << "Description of the parameter: Factor to apply to velocity measurements";
+            yCError(XTrainerParamsCOMPONENT) << "Remember: Units for this parameter are: 'deg/s'";
             return false;
         }
         prop_check.unput("velocityRatio");
@@ -323,16 +329,30 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
                 }
                 else
                 {
-                     yCError(XTrainerControlBoardParamsCOMPONENT) <<"parameter 'offsets' is not a properly formatted bottle";
+                     yCError(XTrainerParamsCOMPONENT) <<"parameter 'offsets' is not a properly formatted bottle";
                 }
             }
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'offsets' using value:" << m_offsets;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'offsets' using value:" << m_offsets;
         }
         else
         {
-            yCInfo(XTrainerControlBoardParamsCOMPONENT) << "Parameter 'offsets' using DEFAULT value:" << m_offsets;
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'offsets' using DEFAULT value:" << m_offsets;
         }
         prop_check.unput("offsets");
+    }
+
+    //Parser of parameter period
+    {
+        if (config.check("period"))
+        {
+            m_period = config.find("period").asFloat64();
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'period' using value:" << m_period;
+        }
+        else
+        {
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'period' using DEFAULT value:" << m_period;
+        }
+        prop_check.unput("period");
     }
 
     /*
@@ -345,12 +365,12 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
         {
             if (m_parser_is_strict)
             {
-                yCError(XTrainerControlBoardParamsCOMPONENT) << "User asking for parameter: "<<it->name <<" which is unknown to this parser!";
+                yCError(XTrainerParamsCOMPONENT) << "User asking for parameter: "<<it->name <<" which is unknown to this parser!";
                 extra_params_found = true;
             }
             else
             {
-                yCWarning(XTrainerControlBoardParamsCOMPONENT) << "User asking for parameter: "<< it->name <<" which is unknown to this parser!";
+                yCWarning(XTrainerParamsCOMPONENT) << "User asking for parameter: "<< it->name <<" which is unknown to this parser!";
             }
         }
 
@@ -364,11 +384,11 @@ bool      XTrainerControlBoard_ParamsParser::parseParams(const yarp::os::Searcha
 }
 
 
-std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDeviceParams() const
+std::string      XTrainer_ParamsParser::getDocumentationOfDeviceParams() const
 {
     std::string doc;
     doc = doc + std::string("\n=============================================\n");
-    doc = doc + std::string("This is the help for device: XTrainerControlBoard\n");
+    doc = doc + std::string("This is the help for device: XTrainer\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("This is the list of the parameters accepted by the device:\n");
     doc = doc + std::string("'port': Name of the serial port\n");
@@ -380,10 +400,11 @@ std::string      XTrainerControlBoard_ParamsParser::getDocumentationOfDevicePara
     doc = doc + std::string("'encoderPulses': Number of encoder pulses per revolution\n");
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("'offsets': Offsets to apply to each motor\n");
+    doc = doc + std::string("'period': Period of the encoder acquisition loop\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"\n";
+    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \" --period 0.01\n";
     doc = doc + std::string("Using only mandatory params:\n");
-    doc = doc + " yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
+    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;
 }

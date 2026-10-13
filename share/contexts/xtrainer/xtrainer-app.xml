@@ -1,0 +1,50 @@
+<application>
+    <name>XTrainer App</name>
+    <module>
+        <name>yarprobotinterface</name>
+        <parameters>--context xtrainer</parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>BasicCartesianControl</name>
+        <parameters>
+            --name /xtrainer/left/ccs
+            --remote /xtrainer/left
+            --local /xtrainer/left/nwc
+            --kinematics xtrainer-left.ini
+            --ikPos nrjl
+        </parameters>
+        <node>localhost</node>
+        <deployer>yarpdev</deployer>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/left/state:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>BasicCartesianControl</name>
+        <parameters>
+            --name /xtrainer/right/ccs
+            --remote /xtrainer/right
+            --local /xtrainer/right/nwc
+            --kinematics xtrainer-right.ini
+            --ikPos nrjl
+        </parameters>
+        <node>localhost</node>
+        <deployer>yarpdev</deployer>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/right/state:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>yarpmotorgui</name>
+        <parameters>
+            --robot xtrainer
+            --parts "(left right)"
+        </parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/left/state:o</port>
+            <port timeout="5.0">/xtrainer/right/state:o</port>
+        </dependencies>
+    </module>
+</application>

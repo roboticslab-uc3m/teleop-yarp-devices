@@ -1,6 +1,6 @@
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
-#include "XTrainerControlBoard.hpp"
+#include "XTrainer.hpp"
 
 #include <numeric> // std::iota
 
@@ -8,24 +8,24 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IPositionDirect Related --------------------------------
+// ------------------- IVelocityDirect Related --------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
+yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
         std::vector indices = {j};
         std::vector values = {ref};
-        return setPositions(indices.size(), indices.data(), values.data());
+        return setRefVelocity(indices, values);
     }
 
     std::lock_guard lock(mtx);
 
-    if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0 + m_offsets[j]); !result.isSuccess())
+    if (auto result = motors[j]->setGoalVelocity(ref / m_velocityRatio); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to set position:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set velocity:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -34,34 +34,34 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPosition(int j, double ref)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setPositions(const double * refs)
+yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<double> & vels)
 {
     std::vector<int> indices(NUM_AXES);
     std::iota(indices.begin(), indices.end(), 0);
-    return setPositions(NUM_AXES, indices.data(), refs);
+    return setRefVelocity(indices, vels);
 }
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int * joints, const double * refs)
+yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<int> & jnts, const std::vector<double> & vels)
 {
     std::lock_guard lock(mtx);
 
     auto executor = connector->createGroupExecutor();
 
-    for (auto i = 0; i < n_joint; i++)
+    for (auto i = 0; i < jnts.size(); i++)
     {
-        executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0 + m_offsets[joints[i]]));
+        executor->addCmd(motors[jnts[i]]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
 
-        if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_AXES)
+        if (jnts[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
         {
-            executor->addCmd(motors[NUM_AXES]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
+            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
         }
     }
 
     if (auto result = executor->executeWrite(); !result.isSuccess())
     {
-        yCError(XCB) << "Failed to set positions:" << dynamixel::getErrorMessage(result.error());
+        yCIError(XTR, id()) << "Failed to set velocities:" << dynamixel::getErrorMessage(result.error());
         return yarp::dev::ReturnValue_error_method_failed;
     }
 
@@ -70,7 +70,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::setPositions(int n_joint, const int
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getRefPosition(int joint, double * ref)
+yarp::dev::ReturnValue XTrainer::getRefVelocity(int joint, double & ref)
 {
     CHECK_JOINT(joint);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -78,13 +78,15 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefPosition(int joint, double * 
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getRefPositions(double * refs)
+yarp::dev::ReturnValue XTrainer::getRefVelocity(std::vector<double> & vels)
 {
     bool ok = true;
 
+    vels.resize(NUM_AXES);
+
     for (auto j = 0; j < NUM_AXES; j++)
     {
-        ok &= getRefPosition(j, &refs[j]);
+        ok &= getRefVelocity(j, vels[j]);
     }
 
     return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
@@ -92,13 +94,15 @@ yarp::dev::ReturnValue XTrainerControlBoard::getRefPositions(double * refs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getRefPositions(int n_joint, const int * joints, double * refs)
+yarp::dev::ReturnValue XTrainer::getRefVelocity(const std::vector<int> & jnts, std::vector<double> & vels)
 {
     bool ok = true;
 
-    for (auto i = 0; i < n_joint; i++)
+    vels.resize(jnts.size());
+
+    for (auto i = 0; i < jnts.size(); i++)
     {
-        ok &= getRefPosition(joints[i], &refs[i]);
+        ok &= getRefVelocity(jnts[i], vels[i]);
     }
 
     return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;

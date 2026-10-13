@@ -1,10 +1,10 @@
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
-#include "XTrainerControlBoard.hpp"
+#include "XTrainer.hpp"
 
 // ------------------- IAxisInfo Related ------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getAxisName(int axis, std::string & name)
+yarp::dev::ReturnValue XTrainer::getAxisName(int axis, std::string & name)
 {
     CHECK_JOINT(axis);
     name = std::string("ID") + std::to_string(motors[axis]->getID());
@@ -13,7 +13,7 @@ yarp::dev::ReturnValue XTrainerControlBoard::getAxisName(int axis, std::string &
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainerControlBoard::getJointType(int axis, yarp::dev::JointTypeEnum & type)
+yarp::dev::ReturnValue XTrainer::getJointType(int axis, yarp::dev::JointTypeEnum & type)
 {
     CHECK_JOINT(axis);
     type = yarp::dev::JointTypeEnum::VOCAB_JOINTTYPE_REVOLUTE;

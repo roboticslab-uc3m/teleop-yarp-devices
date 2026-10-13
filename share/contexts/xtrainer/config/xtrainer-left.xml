@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<device name="xtrainer_left" type="XTrainer">
+    <param name="port">/dev/ttyACM0</param>
+    <param name="baudrate">2000000</param>
+    <param name="motorIds">(1 2 4 5 6 7 8)</param>
+    <param name="extraId">3</param>
+    <param name="extraReverse">true</param>
+    <param name="extraOffset">0.0</param>
+    <param name="encoderPulses">4096</param>
+    <param name="velocityRatio">1.373329569</param>
+    <param name="offsets">(45 225 270 223 222 268 172)</param>
+    <param name="period">0.01</param>
+</device>

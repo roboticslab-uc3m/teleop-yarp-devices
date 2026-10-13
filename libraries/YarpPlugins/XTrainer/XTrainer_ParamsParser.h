@@ -8,11 +8,11 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Mon Oct 12 16:31:49 2026
+// Generated on: Mon Oct 12 21:50:01 2026
 
 
-#ifndef XTRAINERCONTROLBOARD_PARAMSPARSER_H
-#define XTRAINERCONTROLBOARD_PARAMSPARSER_H
+#ifndef XTRAINER_PARAMSPARSER_H
+#define XTRAINER_PARAMSPARSER_H
 
 #include <yarp/os/Searchable.h>
 #include <yarp/dev/IDeviceDriverParams.h>
@@ -20,41 +20,42 @@
 #include <cmath>
 
 /**
-* This class is the parameters parser for class XTrainerControlBoard.
+* This class is the parameters parser for class XTrainer.
 *
 * These are the used parameters:
 * | Group name | Parameter name | Type           | Units | Default Value | Required | Description                              | Notes             |
 * |:----------:|:--------------:|:--------------:|:-----:|:-------------:|:--------:|:----------------------------------------:|:-----------------:|
 * | -          | port           | string         | -     | /dev/ttyACM0  | 1        | Name of the serial port                  | -                 |
 * | -          | baudrate       | int            | -     | 2000000       | 1        | Baud rate of the serial port             | -                 |
-* | -          | motorIds       | vector<int>    | -     | 1 2 4 5 6 7 8 | 1        | Motor IDs                                | -                 |
+* | -          | motorIds       | vector<int>    | -     | 1 2 4 5 6 7 8 | 1        | Motor IDs                                | 7th axis: trigger |
 * | -          | extraId        | int            | -     | 0             | 0        | Extra motor ID                           | 0: not used       |
 * | -          | extraReverse   | bool           | -     | false         | 0        | Whether to reverse the extra motor       | -                 |
 * | -          | extraOffset    | double         | deg   | 0.0           | 0        | Offset to apply to the extra motor       | -                 |
 * | -          | encoderPulses  | int            | -     | 4096          | 1        | Number of encoder pulses per revolution  | check .model file |
 * | -          | velocityRatio  | double         | deg/s | 1.373329569   | 1        | Factor to apply to velocity measurements | check .model file |
 * | -          | offsets        | vector<double> | deg   | 0 0 0 0 0 0   | 0        | Offsets to apply to each motor           | -                 |
+* | -          | period         | double         | s     | 0.01          | 0        | Period of the encoder acquisition loop   | -                 |
 *
 * The device can be launched by yarpdev using one of the following examples (with and without all optional parameters):
 * \code{.unparsed}
-* yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \"
+* yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --extraId 0 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" 0 0 0 0 0 0 \" --period 0.01
 * \endcode
 *
 * \code{.unparsed}
-* yarpdev --device XTrainerControlBoard --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569
+* yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" 1 2 4 5 6 7 8 \" --encoderPulses 4096 --velocityRatio 1.373329569
 * \endcode
 *
 */
 
-class XTrainerControlBoard_ParamsParser : public yarp::dev::IDeviceDriverParams
+class XTrainer_ParamsParser : public yarp::dev::IDeviceDriverParams
 {
 public:
-    XTrainerControlBoard_ParamsParser();
-    ~XTrainerControlBoard_ParamsParser() override = default;
+    XTrainer_ParamsParser();
+    ~XTrainer_ParamsParser() override = default;
 
 public:
-    const std::string m_device_classname = {"XTrainerControlBoard"};
-    const std::string m_device_name = {"XTrainerControlBoard"};
+    const std::string m_device_classname = {"XTrainer"};
+    const std::string m_device_name = {"XTrainer"};
     bool m_parser_is_strict = false;
     struct parser_version_type
     {
@@ -74,6 +75,7 @@ public:
     const std::string m_encoderPulses_defaultValue = {"4096"};
     const std::string m_velocityRatio_defaultValue = {"1.373329569"};
     const std::string m_offsets_defaultValue = {"0 0 0 0 0 0"};
+    const std::string m_period_defaultValue = {"0.01"};
 
     std::string m_port = {"/dev/ttyACM0"};
     int m_baudrate = {2000000};
@@ -84,6 +86,7 @@ public:
     int m_encoderPulses = {4096};
     double m_velocityRatio = {1.373329569};
     std::vector<double> m_offsets = { }; //Default values for lists are managed in the class constructor. It is highly recommended to provide a suggested value also for optional string parameters.
+    double m_period = {0.01};
 
     bool          parseParams(const yarp::os::Searchable & config) override;
     std::string   getDeviceClassName() const override { return m_device_classname; }

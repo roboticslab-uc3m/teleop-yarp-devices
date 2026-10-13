@@ -1,12 +1,16 @@
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
-#ifndef __XTRAINER_CONTROL_BOARD_HPP__
-#define __XTRAINER_CONTROL_BOARD_HPP__
+#ifndef __XTRAINER_HPP__
+#define __XTRAINER_HPP__
 
 #include <memory>
 #include <mutex>
 
+#include <yarp/os/PeriodicThread.h>
+
 #include <yarp/dev/DeviceDriver.h>
+#include <yarp/dev/PolyDriver.h>
+// motor interfaces
 #include <yarp/dev/IAxisInfo.h>
 #include <yarp/dev/IControlLimits.h>
 #include <yarp/dev/IControlMode.h>
@@ -15,39 +19,49 @@
 #include <yarp/dev/IPositionDirect.h>
 #include <yarp/dev/IPWMControl.h>
 #include <yarp/dev/IVelocityDirect.h>
-#include <yarp/dev/PolyDriver.h>
+// joypad interface
+#include <yarp/dev/IJoypadController.h>
 
 #include <dynamixel_easy_sdk/dynamixel_easy_sdk.hpp>
 
-#include "XTrainerControlBoard_ParamsParser.h"
+#include "XTrainer_ParamsParser.h"
 
-constexpr auto NUM_AXES = 6; // controlled axes
+constexpr auto NUM_AXES = 6; // controlled axes (exposed by the motor NWS), not including the trigger
+constexpr auto NUM_MOTORS = NUM_AXES + 1; // all axesincluding the trigger motor (exposed by the joypad NWS)
 constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
+constexpr auto NUM_BUTTONS = 2;
 
 #define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= NUM_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
 
 /**
  * @ingroup YarpPlugins
- * @defgroup XTrainerControlBoard
- * @brief Contains XTrainerControlBoard.
+ * @defgroup XTrainer
+ * @brief Contains XTrainer.
  */
 
 /**
- * @ingroup XTrainerControlBoard
+ * @ingroup XTrainer
  * @brief Implements several motor interfaces.
  */
-class XTrainerControlBoard : public yarp::dev::DeviceDriver,
-                             public yarp::dev::IAxisInfo,
-                             public yarp::dev::IControlLimits,
-                             public yarp::dev::IControlMode,
-                             public yarp::dev::IEncodersTimed,
-                             public yarp::dev::IPidControl,
-                             public yarp::dev::IPositionDirect,
-                             public yarp::dev::IPWMControl,
-                             public yarp::dev::IVelocityDirect,
-                             public XTrainerControlBoard_ParamsParser
+class XTrainer : public yarp::dev::DeviceDriver,
+                 public yarp::os::PeriodicThread,
+                 // motor interfaces
+                 public yarp::dev::IAxisInfo,
+                 public yarp::dev::IControlLimits,
+                 public yarp::dev::IControlMode,
+                 public yarp::dev::IEncodersTimed,
+                 public yarp::dev::IPidControl,
+                 public yarp::dev::IPositionDirect,
+                 public yarp::dev::IPWMControl,
+                 public yarp::dev::IVelocityDirect,
+                 // joypad interface
+                 public yarp::dev::IJoypadController,
+                 // parameter parser interface
+                 public XTrainer_ParamsParser
 {
 public:
+    XTrainer() : yarp::os::PeriodicThread(1.0, yarp::os::ShouldUseSystemClock::Yes) {}
+
     // --------- IAxisInfo Declarations. Implementation in IAxisInfoImpl.cpp ---------
     yarp::dev::ReturnValue getAxisName(int axis, std::string & name) override;
     yarp::dev::ReturnValue getJointType(int axis, yarp::dev::JointTypeEnum & type) override;
@@ -136,16 +150,36 @@ public:
     yarp::dev::ReturnValue getRefVelocity(std::vector<double> & vels) override;
     yarp::dev::ReturnValue getRefVelocity(const std::vector<int> & jnts, std::vector<double> & vels) override;
 
+    // ------- IJoypadController declarations. Implementation in IJoypadControllerImpl.cpp -------
+    yarp::dev::ReturnValue getAxisCount(std::size_t & axis_count) override;
+    yarp::dev::ReturnValue getButtonCount(std::size_t & button_count) override;
+    yarp::dev::ReturnValue getTrackballCount(std::size_t & trackball_count) override;
+    yarp::dev::ReturnValue getHatCount(std::size_t & hat_count) override;
+    yarp::dev::ReturnValue getTouchSurfaceCount(std::size_t & touch_count) override;
+    yarp::dev::ReturnValue getStickCount(std::size_t & stick_count) override;
+    yarp::dev::ReturnValue getButton(std::size_t button_id, double & value) override;
+    yarp::dev::ReturnValue getTrackball(std::size_t trackball_id, yarp::dev::TrackballData & value) override;
+    yarp::dev::ReturnValue getHat(std::size_t hat_id, unsigned char & value) override;
+    yarp::dev::ReturnValue getAxis(std::size_t axis_id, double & value) override;
+    yarp::dev::ReturnValue getAllAxes(std::vector<double> & values) override;
+    yarp::dev::ReturnValue getStick(std::size_t stick_id, yarp::dev::StickData & value, JoypadCtrl_coordinateMode coordinate_mode) override;
+    yarp::dev::ReturnValue getTouch(std::size_t touch_id, std::vector<yarp::dev::TouchData> & value) override;
+
     // -------- DeviceDriver declarations. Implementation in DeviceDriverImpl.cpp --------
     bool open(yarp::os::Searchable & config) override;
     bool close() override;
+
+protected:
+    void run() override;
 
 private:
     bool setPidInternal(const yarp::dev::PidControlTypeEnum & pidtype, int j, const yarp::dev::Pid & pid);
 
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
+    std::vector<double> lastJointPositions;
+    std::vector<double> lastButtonStates;
     std::mutex mtx;
 };
 
-#endif // __XTRAINER_CONTROL_BOARD_HPP__
+#endif // __XTRAINER_HPP__
