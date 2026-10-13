@@ -8,6 +8,3 @@ if(ENABLE_XTrainer)
                            contexts/xtrainer
                  DESTINATION ${TELEOP-YARP-DEVICES_CONTEXTS_INSTALL_DIR})
 endif()
-
-yarp_install(FILES applications/ymanager.ini
-             DESTINATION ${TELEOP-YARP-DEVICES_APPLICATIONS_INSTALL_DIR})
