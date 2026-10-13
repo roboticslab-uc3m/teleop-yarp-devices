@@ -125,6 +125,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
     }
 
     lastJointPositions.resize(NUM_MOTORS);
+    lastButtonStates.resize(NUM_BUTTONS);
 
     if (!yarp::os::PeriodicThread::setPeriod(m_period) || !yarp::os::PeriodicThread::start())
     {

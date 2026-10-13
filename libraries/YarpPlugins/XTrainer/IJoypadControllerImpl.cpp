@@ -10,7 +10,7 @@
 
 yarp::dev::ReturnValue XTrainer::getAxisCount(std::size_t & axis_count)
 {
-    axis_count = 7;
+    axis_count = NUM_MOTORS;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -18,7 +18,7 @@ yarp::dev::ReturnValue XTrainer::getAxisCount(std::size_t & axis_count)
 
 yarp::dev::ReturnValue XTrainer::getButtonCount(std::size_t & button_count)
 {
-    button_count = 0;
+    button_count = NUM_BUTTONS;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -58,7 +58,14 @@ yarp::dev::ReturnValue XTrainer::getStickCount(std::size_t & stick_count)
 
 yarp::dev::ReturnValue XTrainer::getButton(std::size_t button_id, double & value)
 {
-    return yarp::dev::ReturnValue_error_not_implemented_by_device;
+    if (button_id < 0 || button_id >= NUM_BUTTONS)
+    {
+        yCError(XTR) << "Button ID out of bounds:" << button_id;
+        return yarp::dev::ReturnValue_error_input_out_of_bounds;
+    }
+
+    value = lastButtonStates[button_id];
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------

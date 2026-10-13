@@ -29,6 +29,7 @@
 constexpr auto NUM_AXES = 6; // controlled axes (exposed by the motor NWS), not including the trigger
 constexpr auto NUM_MOTORS = NUM_AXES + 1; // all axesincluding the trigger motor (exposed by the joypad NWS)
 constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
+constexpr auto NUM_BUTTONS = 2;
 
 #define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= NUM_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
 
@@ -177,6 +178,7 @@ private:
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
     std::vector<double> lastJointPositions;
+    std::vector<double> lastButtonStates;
     std::mutex mtx;
 };
 
