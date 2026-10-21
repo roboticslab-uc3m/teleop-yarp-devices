@@ -258,6 +258,8 @@ bool SpaceNavigator::getAxis(unsigned int axis_id, double & value)
 #if YARP_VERSION_COMPARE(>=, 4, 0, 0)
 yarp::dev::ReturnValue SpaceNavigator::getAllAxes(std::vector<double> & values)
 {
+    std::lock_guard lock(mtx);
+
     values = {
         normalize(dx / m_fullScaleX, deadband),
         normalize(dy / m_fullScaleY, deadband),
