@@ -64,6 +64,7 @@ yarp::dev::ReturnValue XTrainer::getButton(std::size_t button_id, double & value
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
+    std::lock_guard lock(mtx);
     value = lastButtonStates[button_id];
     return yarp::dev::ReturnValue_ok;
 }
