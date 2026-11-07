@@ -12,7 +12,7 @@ yarp::dev::ReturnValue XTrainer::setPosLimits(int axis, double min, double max)
 {
     CHECK_JOINT(axis);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[axis]->setMinPositionLimit(min * m_encoderPulses / 360.0 + m_offsets[axis]); !result.isSuccess())
     {
@@ -39,7 +39,7 @@ yarp::dev::ReturnValue XTrainer::getPosLimits(int axis, double * min, double * m
 {
     CHECK_JOINT(axis);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[axis]->getMinPositionLimit(); !result.isSuccess())
     {
@@ -70,7 +70,7 @@ yarp::dev::ReturnValue XTrainer::setVelLimits(int axis, double min, double max)
 {
     CHECK_JOINT(axis);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[axis]->setVelocityLimit(max / m_velocityRatio); !result.isSuccess())
     {
@@ -91,7 +91,7 @@ yarp::dev::ReturnValue XTrainer::getVelLimits(int axis, double * min, double * m
 {
     CHECK_JOINT(axis);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[axis]->getVelocityLimit(); !result.isSuccess())
     {

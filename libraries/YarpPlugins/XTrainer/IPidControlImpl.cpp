@@ -77,7 +77,7 @@ yarp::dev::ReturnValue XTrainer::setPid(const yarp::dev::PidControlTypeEnum &pid
 {
     CHECK_JOINT(j);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     bool ok = setPidInternal(pidtype, j, pid);
 

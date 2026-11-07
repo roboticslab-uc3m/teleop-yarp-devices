@@ -21,7 +21,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
         return setRefVelocity(indices, values);
     }
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[j]->setGoalVelocity(ref / m_velocityRatio); !result.isSuccess())
     {
@@ -45,7 +45,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<double> & vels
 
 yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<int> & jnts, const std::vector<double> & vels)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executor = connector->createGroupExecutor();
 

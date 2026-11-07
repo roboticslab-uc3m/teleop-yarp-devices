@@ -177,9 +177,13 @@ private:
 
     std::unique_ptr<dynamixel::Connector> connector {nullptr};
     std::vector<std::unique_ptr<dynamixel::Motor>> motors;
+
     std::vector<double> lastJointPositions;
     std::vector<double> lastButtonStates;
-    std::mutex mtx;
+
+    std::mutex dxlMutex;
+    std::mutex axisMutex;
+    std::mutex buttonMutex;
 };
 
 #endif // __XTRAINER_HPP__

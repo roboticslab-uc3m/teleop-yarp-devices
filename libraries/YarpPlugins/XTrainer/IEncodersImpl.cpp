@@ -39,7 +39,7 @@ yarp::dev::ReturnValue XTrainer::resetEncoders()
 yarp::dev::ReturnValue XTrainer::setEncoder(int j, double val)
 {
     CHECK_JOINT(j);
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
     m_offsets[j] += val;
     return yarp::dev::ReturnValue_ok;
 }
@@ -48,7 +48,7 @@ yarp::dev::ReturnValue XTrainer::setEncoder(int j, double val)
 
 yarp::dev::ReturnValue XTrainer::setEncoders(const double * vals)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     for (auto i = 0; i < NUM_AXES; i++)
     {
@@ -63,7 +63,7 @@ yarp::dev::ReturnValue XTrainer::setEncoders(const double * vals)
 yarp::dev::ReturnValue XTrainer::getEncoder(int j, double * v)
 {
     CHECK_JOINT(j);
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(axisMutex);
     *v = lastJointPositions[j];
     return yarp::dev::ReturnValue_ok;
 }
@@ -72,7 +72,7 @@ yarp::dev::ReturnValue XTrainer::getEncoder(int j, double * v)
 
 yarp::dev::ReturnValue XTrainer::getEncoders(double * encs)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(axisMutex);
     std::copy(lastJointPositions.begin(), lastJointPositions.end(), encs);
     return yarp::dev::ReturnValue_ok;
 }
@@ -83,7 +83,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeed(int j, double * sp)
 {
     CHECK_JOINT(j);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[j]->getPresentVelocity(); !result.isSuccess())
     {
@@ -102,7 +102,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeed(int j, double * sp)
 
 yarp::dev::ReturnValue XTrainer::getEncoderSpeeds(double * spds)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executor = connector->createGroupExecutor();
 

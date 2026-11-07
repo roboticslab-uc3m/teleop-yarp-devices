@@ -136,7 +136,7 @@ yarp::dev::ReturnValue XTrainer::setControlMode(int j, yarp::dev::SelectableCont
 
     yCIDebug(XTR, id()) << "Setting control mode of joint" << j << "to" << yarp::os::Vocab32::decode(static_cast<yarp::conf::vocab32_t>(mode));
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     const auto dxlMode = yarpToDynamixelControlMode(mode);
     const bool idleModeRequested = mode == yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE;
@@ -208,7 +208,7 @@ yarp::dev::ReturnValue XTrainer::setControlModes(const std::vector<int> & joints
         dxlModes.push_back(yarpToDynamixelControlMode(mode));
     }
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executorOff = connector->createGroupExecutor();
 

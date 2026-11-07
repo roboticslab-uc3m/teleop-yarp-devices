@@ -64,7 +64,7 @@ yarp::dev::ReturnValue XTrainer::getButton(std::size_t button_id, double & value
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(buttonMutex);
     value = lastButtonStates[button_id];
     return yarp::dev::ReturnValue_ok;
 }
@@ -93,7 +93,7 @@ yarp::dev::ReturnValue XTrainer::getAxis(std::size_t axis_id, double & value)
         return yarp::dev::ReturnValue_error_input_out_of_bounds;
     }
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(axisMutex);
     value = lastJointPositions[axis_id];
     return yarp::dev::ReturnValue_ok;
 }
@@ -102,7 +102,7 @@ yarp::dev::ReturnValue XTrainer::getAxis(std::size_t axis_id, double & value)
 
 yarp::dev::ReturnValue XTrainer::getAllAxes(std::vector<double> & values)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(axisMutex);
     values = lastJointPositions;
     return yarp::dev::ReturnValue_ok;
 }

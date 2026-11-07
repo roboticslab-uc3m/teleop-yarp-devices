@@ -19,7 +19,7 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
 {
     CHECK_JOINT(m);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (m == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
     {
@@ -49,7 +49,7 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
 
 yarp::dev::ReturnValue XTrainer::setRefDutyCycles(const double * refs)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executor = connector->createGroupExecutor();
 
@@ -100,7 +100,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycle(int m, double * val)
 {
     CHECK_JOINT(m);
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[m]->getPresentPWM(); !result.isSuccess())
     {
@@ -119,7 +119,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycle(int m, double * val)
 
 yarp::dev::ReturnValue XTrainer::getDutyCycles(double * vals)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executor = connector->createGroupExecutor();
 

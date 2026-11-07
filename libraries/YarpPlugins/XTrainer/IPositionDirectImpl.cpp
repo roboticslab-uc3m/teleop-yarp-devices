@@ -21,7 +21,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
         return setPositions(indices.size(), indices.data(), values.data());
     }
 
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     if (auto result = motors[j]->setGoalPosition(ref * m_encoderPulses / 360.0 + m_offsets[j]); !result.isSuccess())
     {
@@ -45,7 +45,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(const double *refs)
 
 yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int *joints, const double *refs)
 {
-    std::lock_guard lock(mtx);
+    std::lock_guard lock(dxlMutex);
 
     auto executor = connector->createGroupExecutor();
 
