@@ -6,6 +6,22 @@
         <node>localhost</node>
     </module>
     <module>
+        <name>yarprobotinterface</name>
+        <parameters>
+            --context xtrainer
+            --from yarprobotinterface-left.ini
+        </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>yarprobotinterface</name>
+        <parameters>
+            --context xtrainer
+            --from yarprobotinterface-right.ini
+        </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
         <name>BasicCartesianControl</name>
         <parameters>
             --name /xtrainer/left/ccs
@@ -45,6 +61,64 @@
         <dependencies>
             <port timeout="5.0">/xtrainer/left/state:o</port>
             <port timeout="5.0">/xtrainer/right/state:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>yarpmotorgui</name>
+        <parameters>
+            --robot xtrainer
+            --parts "(left)"
+        </parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/left/state:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>yarpmotorgui</name>
+        <parameters>
+            --robot xtrainer
+            --parts "(right)"
+        </parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/right/state:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>streamingDeviceController</name>
+        <parameters>
+            --streamingDevice XTrainer
+            --scaling 1.0
+            --XTrainer::local /XTrainerDeviceClient/left
+            --XTrainer::remote /xtrainer/joypad/left
+            --XTrainer::kinematics xtrainer-left.ini
+            --XTrainer::deviceFrameRPY "(0 0 0)"
+            --CARTESIAN::device CartesianControlClientROS2
+            --CARTESIAN::name /streamingDeviceController/cartesian/left
+            --CARTESIAN::ns /xtrainer/left
+        </parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/joypad/left/axis:o</port>
+        </dependencies>
+    </module>
+    <module>
+        <name>streamingDeviceController</name>
+        <parameters>
+            --streamingDevice XTrainer
+            --scaling 1.0
+            --XTrainer::local /XTrainerDeviceClient/right
+            --XTrainer::remote /xtrainer/joypad/right
+            --XTrainer::kinematics xtrainer-right.ini
+            --XTrainer::deviceFrameRPY "(0 0 0)"
+            --CARTESIAN::device CartesianControlClientROS2
+            --CARTESIAN::name /streamingDeviceController/cartesian/right
+            --CARTESIAN::ns /xtrainer/right
+        </parameters>
+        <node>localhost</node>
+        <dependencies>
+            <port timeout="5.0">/xtrainer/joypad/right/axis:o</port>
         </dependencies>
     </module>
 </application>
