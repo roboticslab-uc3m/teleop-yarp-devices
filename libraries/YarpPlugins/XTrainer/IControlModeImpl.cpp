@@ -70,6 +70,8 @@ yarp::dev::ReturnValue XTrainer::getControlMode(int j, yarp::dev::ControlModeEnu
 {
     CHECK_JOINT(j);
 
+    std::lock_guard lock(dxlMutex);
+
     if (motors[j]->getTorqueStatus() == 1)
     {
         auto modeStatus = motors[j]->getOperatingModeStatus();
@@ -87,32 +89,48 @@ yarp::dev::ReturnValue XTrainer::getControlMode(int j, yarp::dev::ControlModeEnu
 
 yarp::dev::ReturnValue XTrainer::getControlModes(std::vector<yarp::dev::ControlModeEnum> & modes)
 {
-    bool ok = true;
-
     modes.resize(NUM_AXES);
+
+    std::lock_guard lock(dxlMutex);
 
     for (auto i = 0; i < NUM_AXES; i++)
     {
-        ok &= getControlMode(i, modes[i]);
+        if (motors[i]->getTorqueStatus() == 1)
+        {
+            auto modeStatus = motors[i]->getOperatingModeStatus();
+            modes[i] = dynamixelToYarpControlMode(modeStatus);
+        }
+        else
+        {
+            modes[i] = yarp::dev::ControlModeEnum::VOCAB_CM_IDLE;
+        }
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getControlModes(const std::vector<int> & joints, std::vector<yarp::dev::ControlModeEnum> & modes)
 {
-    bool ok = true;
-
     modes.resize(joints.size());
+
+    std::lock_guard lock(dxlMutex);
 
     for (auto i = 0; i < joints.size(); i++)
     {
-        ok &= getControlMode(joints[i], modes[i]);
+        if (motors[joints[i]]->getTorqueStatus() == 1)
+        {
+            auto modeStatus = motors[joints[i]]->getOperatingModeStatus();
+            modes[i] = dynamixelToYarpControlMode(modeStatus);
+        }
+        else
+        {
+            modes[i] = yarp::dev::ControlModeEnum::VOCAB_CM_IDLE;
+        }
     }
 
-    return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
+    return yarp::dev::ReturnValue_ok;
 }
 
 // -----------------------------------------------------------------------------
