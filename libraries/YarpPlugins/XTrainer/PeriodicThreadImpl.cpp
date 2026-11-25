@@ -4,11 +4,41 @@
 
 #include <cmath> // std::max
 
+#include <algorithm> // std::any_of
+
 #include <yarp/os/LogStream.h>
 
 #include "LogComponent.hpp"
 
 constexpr auto THROTTLE = 1.0; // [s]
+
+namespace
+{
+    bool switchTorque(yarp::dev::IControlMode * handle, bool & state)
+    {
+        std::vector<yarp::dev::ControlModeEnum> current;
+
+        if (!handle->getControlModes(current))
+        {
+            return false;
+        }
+
+        std::vector<yarp::dev::SelectableControlModeEnum> requested;
+
+        if (std::any_of(current.begin(), current.end(), [](const auto & mode) { return mode == yarp::dev::ControlModeEnum::VOCAB_CM_IDLE; }))
+        {
+            requested.assign(current.size(), yarp::dev::SelectableControlModeEnum::VOCAB_CM_POSITION_DIRECT);
+            state = true;
+        }
+        else
+        {
+            requested.assign(current.size(), yarp::dev::SelectableControlModeEnum::VOCAB_CM_IDLE);
+            state = false;
+        }
+
+        return handle->setControlModes(requested);
+    }
+}
 
 // ------------------- IAxisInfo Related ------------------------------------
 
@@ -86,9 +116,29 @@ void XTrainer::run()
         }
     }
 
+    bool torqueSwitchRequested = false;
+
     {
         std::lock_guard lock(buttonMutex);
+
+        if (m_torqueSwitchId != TORQUE_SWITCH_DISABLED && lastButtonStates[m_torqueSwitchId] == 0.0 && buttonStatesBuffer[m_torqueSwitchId] == 1.0)
+        {
+            torqueSwitchRequested = true; // button was pressed
+        }
+
         lastButtonStates = buttonStatesBuffer;
+    }
+
+    if (torqueSwitchRequested)
+    {
+        if (bool state; switchTorque(this, state))
+        {
+            yCIInfo(XTR, id()) << "Setting torque" << (state ? "ON" : "OFF");
+        }
+        else
+        {
+            yCIError(XTR, id()) << "Failed to switch torque";
+        }
     }
 }
 

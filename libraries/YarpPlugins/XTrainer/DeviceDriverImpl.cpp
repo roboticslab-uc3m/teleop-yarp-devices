@@ -93,6 +93,15 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
+    if (m_torqueSwitchId > -1 && m_torqueSwitchId < NUM_BUTTONS)
+    {
+        yCIInfo(XTR, id()) << "Using button with ID" << m_torqueSwitchId << "as torque switch";
+    }
+    else
+    {
+        m_torqueSwitchId = TORQUE_SWITCH_DISABLED;
+    }
+
     connector = std::make_unique<dynamixel::Connector>(m_port, m_baudrate);
 
     if (auto result = connector->broadcastPing(); result.isSuccess())

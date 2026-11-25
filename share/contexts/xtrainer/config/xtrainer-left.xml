@@ -11,4 +11,5 @@
     <param name="velocityRatio">1.373329569</param>
     <param name="offsets">(45 225 270 223 222 268 172)</param>
     <param name="period">0.01</param>
+    <param name="torqueSwitchId">0</param>
 </device>

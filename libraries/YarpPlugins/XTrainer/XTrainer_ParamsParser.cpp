@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Sat Nov  7 18:22:52 2026
+// Generated on: Wed Nov 25 17:54:14 2026
 
 
 #include "XTrainer_ParamsParser.h"
@@ -76,6 +76,7 @@ std::vector<std::string> XTrainer_ParamsParser::getListOfParams() const
     params.push_back("velocityRatio");
     params.push_back("offsets");
     params.push_back("period");
+    params.push_back("torqueSwitchId");
     return params;
 }
 
@@ -145,6 +146,11 @@ bool XTrainer_ParamsParser::getParamValue(const std::string& paramName, std::str
     if (paramName =="period")
     {
         paramValue = std::to_string(m_period);
+        return true;
+    }
+    if (paramName =="torqueSwitchId")
+    {
+        paramValue = std::to_string(m_torqueSwitchId);
         return true;
     }
 
@@ -355,6 +361,20 @@ bool      XTrainer_ParamsParser::parseParams(const yarp::os::Searchable & config
         prop_check.unput("period");
     }
 
+    //Parser of parameter torqueSwitchId
+    {
+        if (config.check("torqueSwitchId"))
+        {
+            m_torqueSwitchId = config.find("torqueSwitchId").asInt64();
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'torqueSwitchId' using value:" << m_torqueSwitchId;
+        }
+        else
+        {
+            yCInfo(XTrainerParamsCOMPONENT) << "Parameter 'torqueSwitchId' using DEFAULT value:" << m_torqueSwitchId;
+        }
+        prop_check.unput("torqueSwitchId");
+    }
+
     /*
     //This code check if the user set some parameter which are not check by the parser
     //If the parser is set in strict mode, this will generate an error
@@ -401,9 +421,10 @@ std::string      XTrainer_ParamsParser::getDocumentationOfDeviceParams() const
     doc = doc + std::string("'velocityRatio': Factor to apply to velocity measurements\n");
     doc = doc + std::string("'offsets': Offsets to apply to each motor\n");
     doc = doc + std::string("'period': Period of the encoder acquisition loop\n");
+    doc = doc + std::string("'torqueSwitchId': ID of button used as torque switch (on/off)\n");
     doc = doc + std::string("\n");
     doc = doc + std::string("Here are some examples of invocation command with yarpdev, with all params:\n");
-    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" (1 2 4 5 6 7 8) \" --extraId 3 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" (0 0 0 0 0 0) \" --period 0.01\n";
+    doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" (1 2 4 5 6 7 8) \" --extraId 3 --extraReverse false --extraOffset 0.0 --encoderPulses 4096 --velocityRatio 1.373329569 --offsets \" (0 0 0 0 0 0) \" --period 0.01 --torqueSwitchId -1\n";
     doc = doc + std::string("Using only mandatory params:\n");
     doc = doc + " yarpdev --device XTrainer --port /dev/ttyACM0 --baudrate 2000000 --motorIds \" (1 2 4 5 6 7 8) \" --encoderPulses 4096 --velocityRatio 1.373329569\n";
     doc = doc + std::string("=============================================\n\n");    return doc;

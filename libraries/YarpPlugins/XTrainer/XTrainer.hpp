@@ -184,6 +184,8 @@ private:
     std::mutex dxlMutex;
     std::mutex axisMutex;
     std::mutex buttonMutex;
+
+    static constexpr int TORQUE_SWITCH_DISABLED = -1;
 };
 
 #endif // __XTRAINER_HPP__
