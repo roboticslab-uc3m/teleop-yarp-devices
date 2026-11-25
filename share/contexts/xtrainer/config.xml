@@ -10,4 +10,6 @@
 
     <xi:include href="./nws/joypad-left.xml" enabled_by="left" disabled_by="disable_joypad" />
     <xi:include href="./nws/joypad-right.xml" enabled_by="right" disabled_by="disable_joypad" />
+
+    <xi:include href="./nws/description.xml" />
 </robot>
