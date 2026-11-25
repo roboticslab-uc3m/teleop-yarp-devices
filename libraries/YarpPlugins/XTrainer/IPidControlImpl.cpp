@@ -6,7 +6,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IPidControl Related --------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAvailablePids(int j, std::vector<yarp::dev::PidControlTypeEnum> &avail)
 {

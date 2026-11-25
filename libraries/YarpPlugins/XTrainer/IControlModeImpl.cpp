@@ -55,7 +55,7 @@ namespace
     }
 }
 
-// ------------------- IControlMode Related ------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAvailableControlModes(int j, std::vector<yarp::dev::SelectableControlModeEnum> & avail)
 {

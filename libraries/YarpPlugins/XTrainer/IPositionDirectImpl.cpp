@@ -8,7 +8,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IPositionDirect Related --------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 {
@@ -34,7 +34,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPositions(const double *refs)
+yarp::dev::ReturnValue XTrainer::setPositions(const double * refs)
 {
     std::vector<int> indices(NUM_AXES);
     std::iota(indices.begin(), indices.end(), 0);
@@ -43,7 +43,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(const double *refs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int *joints, const double *refs)
+yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, const double * refs)
 {
     std::lock_guard lock(dxlMutex);
 
@@ -70,7 +70,7 @@ yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int *joints, co
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double *ref)
+yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double * ref)
 {
     CHECK_JOINT(joint);
     return yarp::dev::ReturnValue_error_not_implemented_by_device;
@@ -78,7 +78,7 @@ yarp::dev::ReturnValue XTrainer::getRefPosition(int joint, double *ref)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPositions(double *refs)
+yarp::dev::ReturnValue XTrainer::getRefPositions(double * refs)
 {
     bool ok = true;
 
@@ -92,7 +92,7 @@ yarp::dev::ReturnValue XTrainer::getRefPositions(double *refs)
 
 // -----------------------------------------------------------------------------
 
-yarp::dev::ReturnValue XTrainer::getRefPositions(int n_joint, const int *joints, double *refs)
+yarp::dev::ReturnValue XTrainer::getRefPositions(int n_joint, const int * joints, double * refs)
 {
     bool ok = true;
 

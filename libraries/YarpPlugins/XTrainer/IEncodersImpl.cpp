@@ -11,7 +11,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------ IEncoders Related -----------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAxes(std::size_t & axes)
 {
@@ -149,7 +149,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderAccelerations(double * accs)
     return ok ? yarp::dev::ReturnValue_ok : yarp::dev::ReturnValue_error_method_failed;
 }
 
-// ------------------ IEncodersTimed Related -----------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getEncoderTimed(int j, double * encs, double * time)
 {

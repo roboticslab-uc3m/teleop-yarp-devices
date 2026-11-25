@@ -6,7 +6,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IControlLimits Related ------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::setPosLimits(int axis, double min, double max)
 {

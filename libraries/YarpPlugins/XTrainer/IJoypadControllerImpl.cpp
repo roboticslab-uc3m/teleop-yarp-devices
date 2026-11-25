@@ -6,7 +6,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IJoypadController Related ------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAxisCount(std::size_t & axis_count)
 {

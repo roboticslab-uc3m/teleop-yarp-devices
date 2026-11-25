@@ -8,7 +8,7 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IVelocityDirect Related --------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 {

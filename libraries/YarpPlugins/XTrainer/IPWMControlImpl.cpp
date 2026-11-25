@@ -6,7 +6,8 @@
 
 #include "LogComponent.hpp"
 
-// ------------------- IVelocityDirect Related --------------------------------
+// -----------------------------------------------------------------------------
+
 yarp::dev::ReturnValue XTrainer::getNumberOfMotors(int * number)
 {
     *number = NUM_AXES;

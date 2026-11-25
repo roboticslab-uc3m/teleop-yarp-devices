@@ -2,7 +2,7 @@
 
 #include "XTrainer.hpp"
 
-// ------------------- IAxisInfo Related ------------------------------------
+// -----------------------------------------------------------------------------
 
 yarp::dev::ReturnValue XTrainer::getAxisName(int axis, std::string & name)
 {
