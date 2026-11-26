@@ -92,4 +92,32 @@
             <port timeout="5.0">/xtrainer/joypad/right/axis:o</port>
         </dependencies>
     </module>
+    <module>
+        <name>ros2 run abb_egm_driver egm_driver</name>
+        <parameters>
+            --ros-args
+                --params-file ros2_ws/src/abb_egm_driver/config/crb-15000-5.yaml
+                -r __ns:=/xtrainer/left
+        </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>gnome-terminal</name>
+        <parameters>-e "ros2 run abb_egm_driver keyboard_teleop --ros-args -r __ns:=/xtrainer/left"</parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>ros2 run abb_egm_driver egm_driver</name>
+        <parameters>
+            --ros-args
+                --params-file ros2_ws/src/abb_egm_driver/config/crb-15000-5.yaml
+                -r __ns:=/xtrainer/right
+        </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>gnome-terminal</name>
+        <parameters>-e "ros2 run abb_egm_driver keyboard_teleop --ros-args -r __ns:=/xtrainer/right"</parameters>
+        <node>localhost</node>
+    </module>
 </application>
