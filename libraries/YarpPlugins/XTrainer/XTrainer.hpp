@@ -26,12 +26,13 @@
 
 #include "XTrainer_ParamsParser.h"
 
-constexpr auto NUM_AXES = 6; // controlled axes (exposed by the motor NWS), not including the trigger
-constexpr auto NUM_MOTORS = NUM_AXES + 1; // all axesincluding the trigger motor (exposed by the joypad NWS)
-constexpr auto EXTRA_MOTOR_IDX = 1; // axis index with a dual-motor setup (0-based)
-constexpr auto NUM_BUTTONS = 2;
+constexpr auto N_CBOARD_AXES = 6; // controlled axes exposed by the control board NWS, not including the trigger
+constexpr auto N_JOYPAD_AXES = N_CBOARD_AXES + 1; // controlled axes exposed by the joypad NWS, including the trigger
+constexpr auto N_JOYPAD_BUTTONS = 2;
+constexpr auto DUAL_MOTOR_AXIS_IDX = 1; // index of CB-managed axis with a dual motor setup (0-based)
+constexpr auto EXTRA_MOTOR_IDX = N_CBOARD_AXES + 1; // index of implicitly CB-managed extra motor axis (0-based)
 
-#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= NUM_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
+#define CHECK_JOINT(j) do { if ((j) < 0 || (j) >= N_CBOARD_AXES) return yarp::dev::ReturnValue_error_input_out_of_bounds; } while (0)
 
 /**
  * @ingroup YarpPlugins
@@ -185,6 +186,7 @@ private:
     std::mutex axisMutex;
     std::mutex buttonMutex;
 
+    static constexpr int EXTRA_MOTOR_NOT_USED = -1;
     static constexpr int TORQUE_SWITCH_DISABLED = -1;
 };
 

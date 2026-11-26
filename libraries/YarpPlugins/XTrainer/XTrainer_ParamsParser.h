@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Wed Nov 25 17:54:14 2026
+// Generated on: Thu Nov 26 15:30:58 2026
 
 
 #ifndef XTRAINER_PARAMSPARSER_H
@@ -28,7 +28,7 @@
 * | -          | port           | string         | -     | /dev/ttyACM0    | 1        | Name of the serial port                     | -                 |
 * | -          | baudrate       | int            | -     | 2000000         | 1        | Baud rate of the serial port                | -                 |
 * | -          | motorIds       | vector<int>    | -     | (1 2 4 5 6 7 8) | 1        | Motor IDs                                   | 7th axis: trigger |
-* | -          | extraId        | int            | -     | 3               | 0        | Extra motor ID                              | 0: not used       |
+* | -          | extraId        | int            | -     | 3               | 0        | Extra motor ID                              | -1: not used      |
 * | -          | extraReverse   | bool           | -     | false           | 0        | Whether to reverse the extra motor          | -                 |
 * | -          | extraOffset    | double         | deg   | 0.0             | 0        | Offset to apply to the extra motor          | -                 |
 * | -          | encoderPulses  | int            | -     | 4096            | 1        | Number of encoder pulses per revolution     | check .model file |

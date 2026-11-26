@@ -37,9 +37,9 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_motorIds.size() != NUM_MOTORS)
+    if (m_motorIds.size() != N_JOYPAD_AXES)
     {
-        yCIError(XTR, id()) << "Invalid number of motor IDs, expected" << NUM_MOTORS << "but got" << m_motorIds.size();
+        yCIError(XTR, id()) << "Invalid number of motor IDs, expected" << N_JOYPAD_AXES << "but got" << m_motorIds.size();
         return false;
     }
 
@@ -58,12 +58,12 @@ bool XTrainer::open(yarp::os::Searchable & config)
         }
     }
 
-    if (m_extraId < 0)
+    if (m_extraId < 0 && m_extraId != EXTRA_MOTOR_NOT_USED)
     {
         yCIError(XTR, id()) << "Invalid extra motor ID:" << m_extraId;
         return false;
     }
-    else if (m_extraId != 0 && std::find(m_motorIds.begin(), m_motorIds.end(), m_extraId) != m_motorIds.end())
+    else if (m_extraId != EXTRA_MOTOR_NOT_USED && std::find(m_motorIds.begin(), m_motorIds.end(), m_extraId) != m_motorIds.end())
     {
         yCIError(XTR, id()) << "Extra motor ID" << m_extraId << "is already in the list of motor IDs";
         return false;
@@ -81,9 +81,9 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_offsets.size() != NUM_MOTORS)
+    if (m_offsets.size() != N_JOYPAD_AXES)
     {
-        yCIError(XTR, id()) << "Invalid number of offsets, expected" << NUM_MOTORS << "but got" << m_offsets.size();
+        yCIError(XTR, id()) << "Invalid number of offsets, expected" << N_JOYPAD_AXES << "but got" << m_offsets.size();
         return false;
     }
 
@@ -93,7 +93,7 @@ bool XTrainer::open(yarp::os::Searchable & config)
         return false;
     }
 
-    if (m_torqueSwitchId > -1 && m_torqueSwitchId < NUM_BUTTONS)
+    if (m_torqueSwitchId > -1 && m_torqueSwitchId < N_JOYPAD_BUTTONS)
     {
         yCIInfo(XTR, id()) << "Using button with ID" << m_torqueSwitchId << "as torque switch";
     }
@@ -119,10 +119,10 @@ bool XTrainer::open(yarp::os::Searchable & config)
         motors.push_back(connector->createMotor(id));
     }
 
-    if (m_extraId != 0)
+    if (m_extraId != EXTRA_MOTOR_NOT_USED)
     {
         yCIInfo(XTR, id()) << "Using extra motor with ID" << m_extraId;
-        motors.push_back(connector->createMotor(m_extraId)); // new size: NUM_MOTORS + 1
+        motors.push_back(connector->createMotor(m_extraId)); // new size: N_JOYPAD_AXES + 1
 
         if (m_extraReverse)
         {
@@ -139,8 +139,8 @@ bool XTrainer::open(yarp::os::Searchable & config)
         yCIInfo(XTR, id()) << "Got motor ID" << motorId << "with model number" << modelNumber << "and model name" << modelName;
     }
 
-    lastJointPositions.resize(NUM_MOTORS);
-    lastButtonStates.resize(NUM_BUTTONS);
+    lastJointPositions.resize(N_JOYPAD_AXES);
+    lastButtonStates.resize(N_JOYPAD_BUTTONS);
 
     if (!yarp::os::PeriodicThread::setPeriod(m_period) || !yarp::os::PeriodicThread::start())
     {

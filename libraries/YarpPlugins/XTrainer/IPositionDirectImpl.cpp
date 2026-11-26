@@ -14,7 +14,7 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+    if (j == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
     {
         std::vector indices = {j};
         std::vector values = {ref};
@@ -36,9 +36,9 @@ yarp::dev::ReturnValue XTrainer::setPosition(int j, double ref)
 
 yarp::dev::ReturnValue XTrainer::setPositions(const double * refs)
 {
-    std::vector<int> indices(NUM_AXES);
+    std::vector<int> indices(N_CBOARD_AXES);
     std::iota(indices.begin(), indices.end(), 0);
-    return setPositions(NUM_AXES, indices.data(), refs);
+    return setPositions(N_CBOARD_AXES, indices.data(), refs);
 }
 
 // -----------------------------------------------------------------------------
@@ -53,9 +53,9 @@ yarp::dev::ReturnValue XTrainer::setPositions(int n_joint, const int * joints, c
     {
         executor->addCmd(motors[joints[i]]->stageSetGoalPosition(refs[i] * m_encoderPulses / 360.0 + m_offsets[joints[i]]));
 
-        if (joints[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+        if (joints[i] == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
         {
-            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
+            executor->addCmd(motors[EXTRA_MOTOR_IDX]->stageSetGoalPosition((refs[i] + m_extraOffset) * m_encoderPulses / 360.0 + m_offsets[i]));
         }
     }
 
@@ -82,7 +82,7 @@ yarp::dev::ReturnValue XTrainer::getRefPositions(double * refs)
 {
     bool ok = true;
 
-    for (auto j = 0; j < NUM_AXES; j++)
+    for (auto j = 0; j < N_CBOARD_AXES; j++)
     {
         ok &= getRefPosition(j, &refs[j]);
     }

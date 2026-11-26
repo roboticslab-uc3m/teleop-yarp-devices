@@ -44,15 +44,15 @@ namespace
 
 void XTrainer::run()
 {
-    std::vector<double> jointPositionsBuffer(NUM_MOTORS);
-    std::vector<double> buttonStatesBuffer(NUM_BUTTONS);
+    std::vector<double> jointPositionsBuffer(N_JOYPAD_AXES);
+    std::vector<double> buttonStatesBuffer(N_JOYPAD_BUTTONS);
 
     {
         std::lock_guard lock(dxlMutex);
 
         auto executor = connector->createGroupExecutor();
 
-        for (auto i = 0; i < NUM_MOTORS; i++)
+        for (auto i = 0; i < N_JOYPAD_AXES; i++)
         {
             executor->addCmd(motors[i]->stageGetPresentPosition());
         }
@@ -63,13 +63,13 @@ void XTrainer::run()
         }
         else
         {
-            for (auto i = 0; i < NUM_MOTORS; i++)
+            for (auto i = 0; i < N_JOYPAD_AXES; i++)
             {
                 jointPositionsBuffer[i] = result.value()[i].value() * 360.0 / m_encoderPulses - m_offsets[i];
             }
 
             // make the trigger range from exact 0.0
-            jointPositionsBuffer[NUM_AXES] = std::max(jointPositionsBuffer[NUM_AXES], 0.0);
+            jointPositionsBuffer[N_JOYPAD_AXES - 1] = std::max(jointPositionsBuffer[N_JOYPAD_AXES - 1], 0.0);
         }
     }
 

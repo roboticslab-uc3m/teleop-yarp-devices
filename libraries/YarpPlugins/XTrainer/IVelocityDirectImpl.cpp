@@ -14,7 +14,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 {
     CHECK_JOINT(j);
 
-    if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+    if (j == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
     {
         std::vector indices = {j};
         std::vector values = {ref};
@@ -36,7 +36,7 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(int j, double ref)
 
 yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<double> & vels)
 {
-    std::vector<int> indices(NUM_AXES);
+    std::vector<int> indices(N_CBOARD_AXES);
     std::iota(indices.begin(), indices.end(), 0);
     return setRefVelocity(indices, vels);
 }
@@ -53,9 +53,9 @@ yarp::dev::ReturnValue XTrainer::setRefVelocity(const std::vector<int> & jnts, c
     {
         executor->addCmd(motors[jnts[i]]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
 
-        if (jnts[i] == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+        if (jnts[i] == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
         {
-            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
+            executor->addCmd(motors[EXTRA_MOTOR_IDX]->stageSetGoalVelocity(vels[i] / m_velocityRatio));
         }
     }
 
@@ -82,9 +82,9 @@ yarp::dev::ReturnValue XTrainer::getRefVelocity(std::vector<double> & vels)
 {
     bool ok = true;
 
-    vels.resize(NUM_AXES);
+    vels.resize(N_CBOARD_AXES);
 
-    for (auto j = 0; j < NUM_AXES; j++)
+    for (auto j = 0; j < N_CBOARD_AXES; j++)
     {
         ok &= getRefVelocity(j, vels[j]);
     }

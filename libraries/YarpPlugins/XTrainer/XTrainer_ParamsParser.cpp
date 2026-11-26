@@ -8,7 +8,7 @@
 // This is an automatically generated file. Please do not edit it.
 // It will be re-generated if the cmake flag ALLOW_DEVICE_PARAM_PARSER_GENERATION is ON.
 
-// Generated on: Wed Nov 25 17:54:14 2026
+// Generated on: Thu Nov 26 15:30:58 2026
 
 
 #include "XTrainer_ParamsParser.h"

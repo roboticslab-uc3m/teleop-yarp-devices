@@ -15,7 +15,7 @@
 
 yarp::dev::ReturnValue XTrainer::getAxes(std::size_t & axes)
 {
-    axes = NUM_AXES;
+    axes = N_CBOARD_AXES;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -30,7 +30,7 @@ yarp::dev::ReturnValue XTrainer::resetEncoder(int j)
 
 yarp::dev::ReturnValue XTrainer::resetEncoders()
 {
-    std::vector vals(NUM_AXES, 0.0);
+    std::vector vals(N_CBOARD_AXES, 0.0);
     return setEncoders(vals.data());
 }
 
@@ -50,7 +50,7 @@ yarp::dev::ReturnValue XTrainer::setEncoders(const double * vals)
 {
     std::lock_guard lock(dxlMutex);
 
-    for (auto i = 0; i < NUM_AXES; i++)
+    for (auto i = 0; i < N_CBOARD_AXES; i++)
     {
         m_offsets[i] += vals[i];
     }
@@ -106,7 +106,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeeds(double * spds)
 
     auto executor = connector->createGroupExecutor();
 
-    for (auto i = 0; i < NUM_AXES; i++)
+    for (auto i = 0; i < N_CBOARD_AXES; i++)
     {
         executor->addCmd(motors[i]->stageGetPresentVelocity());
     }
@@ -118,7 +118,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderSpeeds(double * spds)
     }
     else
     {
-        for (auto i = 0; i < NUM_AXES; i++)
+        for (auto i = 0; i < N_CBOARD_AXES; i++)
         {
             spds[i] = result.value()[i].value() * m_velocityRatio;
         }
@@ -141,7 +141,7 @@ yarp::dev::ReturnValue XTrainer::getEncoderAccelerations(double * accs)
 {
     bool ok = true;
 
-    for (auto i = 0; i < NUM_AXES; i++)
+    for (auto i = 0; i < N_CBOARD_AXES; i++)
     {
         ok &= getEncoderAcceleration(i, &accs[i]);
     }
@@ -165,7 +165,7 @@ yarp::dev::ReturnValue XTrainer::getEncodersTimed(double * encs, double * time)
     auto ret = getEncoders(encs);
     auto now = yarp::os::SystemClock::nowSystem();
 
-    for (auto i = 0; i < NUM_AXES; i++)
+    for (auto i = 0; i < N_CBOARD_AXES; i++)
     {
         time[i] = now;
     }

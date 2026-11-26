@@ -10,7 +10,7 @@
 
 yarp::dev::ReturnValue XTrainer::getNumberOfMotors(int * number)
 {
-    *number = NUM_AXES;
+    *number = N_CBOARD_AXES;
     return yarp::dev::ReturnValue_ok;
 }
 
@@ -22,11 +22,11 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycle(int m, double ref)
 
     std::lock_guard lock(dxlMutex);
 
-    if (m == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+    if (m == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
     {
         auto executor = connector->createGroupExecutor();
         executor->addCmd(motors[m]->stageSetGoalPWM(ref));
-        executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPWM(ref));
+        executor->addCmd(motors[EXTRA_MOTOR_IDX]->stageSetGoalPWM(ref));
 
         if (auto result = executor->executeWrite(); !result.isSuccess())
         {
@@ -54,13 +54,13 @@ yarp::dev::ReturnValue XTrainer::setRefDutyCycles(const double * refs)
 
     auto executor = connector->createGroupExecutor();
 
-    for (auto j = 0; j < NUM_AXES; j++)
+    for (auto j = 0; j < N_CBOARD_AXES; j++)
     {
         executor->addCmd(motors[j]->stageSetGoalPWM(refs[j]));
 
-        if (j == EXTRA_MOTOR_IDX && motors.size() > NUM_MOTORS)
+        if (j == DUAL_MOTOR_AXIS_IDX && m_extraId != EXTRA_MOTOR_NOT_USED)
         {
-            executor->addCmd(motors[NUM_MOTORS]->stageSetGoalPWM(refs[j]));
+            executor->addCmd(motors[EXTRA_MOTOR_IDX]->stageSetGoalPWM(refs[j]));
         }
     }
 
@@ -87,7 +87,7 @@ yarp::dev::ReturnValue XTrainer::getRefDutyCycles(double * refs)
 {
     bool ok = true;
 
-    for (auto j = 0; j < NUM_AXES; j++)
+    for (auto j = 0; j < N_CBOARD_AXES; j++)
     {
         ok &= getRefDutyCycle(j, &refs[j]);
     }
@@ -124,7 +124,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycles(double * vals)
 
     auto executor = connector->createGroupExecutor();
 
-    for (auto j = 0; j < NUM_AXES; j++)
+    for (auto j = 0; j < N_CBOARD_AXES; j++)
     {
         executor->addCmd(motors[j]->stageGetPresentPWM());
     }
@@ -136,7 +136,7 @@ yarp::dev::ReturnValue XTrainer::getDutyCycles(double * vals)
     }
     else
     {
-        for (auto j = 0; j < NUM_AXES; j++)
+        for (auto j = 0; j < N_CBOARD_AXES; j++)
         {
             vals[j] = result.value()[j].value();
         }
